@@ -579,7 +579,6 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 					break;
 				case CONTROL_MENU_TEMPO:
 					int tempo = score.tempo + delta_x;
-					System.out.println(tempo);
 					if(tempo > 0){
 						score.tempo = tempo;
 						if(!metronone.metrononeThreadSuspended){
