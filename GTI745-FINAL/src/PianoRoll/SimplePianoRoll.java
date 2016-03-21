@@ -564,7 +564,9 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 					float scale = score.numBeats + delta_x;
 					if(scale >= 128){
 						score.increaseNumBeat((int)scale);
-						gw.frame(score.getBoundingRectangle(), true);
+						if(this.simplePianoRoll.isAutoFrameActive){
+							gw.frame(score.getBoundingRectangle(), true);
+						}
 					}
 					break;
 				default:
