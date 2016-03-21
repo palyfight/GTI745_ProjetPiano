@@ -9,7 +9,7 @@ Modifications et fonctionnalités à réaliser:
 
 - ~~**[0.5 point]** Permettez à l'utilisateur de changer la durée totale de la portée de notes en glissant dans le ControlMenu.~~
 
-- ~~**[Variante valant 1 point]** Si la case à cocher "Auto Frame" est cochée, pendant que l'utilisateur glisse pour changer la durée totale, faites un zoom automatique en même temps pour que l'utilisateur voit la portée qui se rallonge ou se raccourcit. indice :~~
+- ~~**[Variante valant 1 point]** Si la case à cocher "Auto Frame" est cochée, pendant que l'utilisateur glisse pour changer la durée totale, faites un zoom automatique en même temps pour que l'utilisateur voit la portée qui se rallonge ou se raccourcit.~~ indice :
 ```java
 gw.frame( score.getBoundingRectangle(),...)
 ```
