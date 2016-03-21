@@ -204,7 +204,22 @@ class Score {
 			new Point2D(numBeats,0)
 		);
 	}
-
+	
+	public void increaseNumBeat(int numBeats){
+		this.grid = cloneGrid(this.grid, numBeats);
+	}
+	
+	public boolean[][] cloneGrid(boolean[][] oldGrid, int numBeats){
+		boolean [][] newGrid = new boolean [numBeats][ this.numPitches ]; 
+		for ( int y = 0; y < numPitches; ++y ) {
+			for ( int x = 0; x <  Math.min(this.numBeats, numBeats) ; ++x ) {
+				newGrid[x][y] = oldGrid[x][y];
+			}
+		}		
+		this.numBeats = numBeats;
+		return newGrid;
+	}
+	
 }
 
 class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotionListener, Runnable {
@@ -272,6 +287,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				score.grid[x][y] = false;
 		repaint();
 	}
+	
 	public void frameAll() {
 		gw.frame( score.getBoundingRectangle(), false );
 		repaint();
@@ -365,6 +381,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				if ( score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] != true ) {
 					score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] = true;
 					repaint();
+					
 				}
 			}
 			else if ( simplePianoRoll.dragMode == SimplePianoRoll.DM_ERASE_NOTES ) {
@@ -543,6 +560,13 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				case CONTROL_MENU_ZOOM:
 					gw.zoomIn( (float)Math.pow( Constant.zoomFactorPerPixelDragged, delta_x-delta_y ) );
 					break;
+				case CONTROL_MENU_TOTAL_DURATION:
+					float scale = score.numBeats + delta_x;
+					if(scale >= 128){
+						score.increaseNumBeat((int)scale);
+						gw.frame(score.getBoundingRectangle(), true);
+					}
+					break;
 				default:
 					// TODO XXX
 					break;
@@ -627,6 +651,8 @@ public class SimplePianoRoll implements ActionListener {
 	MidiChannel [] midiChannels;
 
 	JMenuItem clearMenuItem;
+	JMenuItem loadMidiItem;
+	JMenuItem saveMidiItem;
 	JMenuItem quitMenuItem;
 	JCheckBoxMenuItem showToolsMenuItem;
 	JCheckBoxMenuItem highlightMajorScaleMenuItem;
@@ -794,6 +820,15 @@ public class SimplePianoRoll implements ActionListener {
 
 		JMenuBar menuBar = new JMenuBar();
 			JMenu menu = new JMenu("File");
+				loadMidiItem = new JMenuItem("Load MIDI");
+				loadMidiItem.addActionListener(this);
+				menu.add(loadMidiItem);
+				
+				saveMidiItem = new JMenuItem("Save MIDI");
+				saveMidiItem.addActionListener(this);
+				menu.add(saveMidiItem);
+				
+				menu.addSeparator();
 				clearMenuItem = new JMenuItem("Clear");
 				clearMenuItem.addActionListener(this);
 				menu.add(clearMenuItem);

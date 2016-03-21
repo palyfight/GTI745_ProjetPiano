@@ -7,9 +7,9 @@ Le bouton gauche de souris, seul ou avec les touches Ctrl ou Shift, permet de la
 La case à cocher "Loop when playing" n'a actuellement aucun effet: lorsqu'on appuie "Play", la musique boucle quelque soit l'état de la case à cocher "Loop when playing". Aussi, dans le ControlMenu, les options "Tempo", "Total Duration", et "Transpose" n'ont actuellement aucun effet. Aussi, dans le menu "View", la case à cocher "Auto Frame" n'a aucun effet. Vous pouvez enlever ces éléments d'interface si vous voulez, mais ces éléments d'interface pourraient aussi vous aider à compléter certains changements.
 Modifications et fonctionnalités à réaliser:
 
-- **[0.5 point]** Permettez à l'utilisateur de changer la durée totale de la portée de notes en glissant dans le ControlMenu. 
+- ~~**[0.5 point]** Permettez à l'utilisateur de changer la durée totale de la portée de notes en glissant dans le ControlMenu.~~
 
-- **[Variante valant 1 point]** Si la case à cocher "Auto Frame" est cochée, pendant que l'utilisateur glisse pour changer la durée totale, faites un zoom automatique en même temps pour que l'utilisateur voit la portée qui se rallonge ou se raccourcit. indice : 
+- ~~**[Variante valant 1 point]** Si la case à cocher "Auto Frame" est cochée, pendant que l'utilisateur glisse pour changer la durée totale, faites un zoom automatique en même temps pour que l'utilisateur voit la portée qui se rallonge ou se raccourcit. indice : ~~
 ```java
 gw.frame( score.getBoundingRectangle(),...)
 ```
