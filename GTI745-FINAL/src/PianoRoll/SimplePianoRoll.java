@@ -58,7 +58,7 @@ import javax.swing.SwingUtilities;
       lowest key (1st key):       A0            21                     9
       middle C:                   C4            60                     0
       highest key (88th key):     C8           108                     0
-*/
+ */
 
 
 class Score {
@@ -141,12 +141,12 @@ class Score {
 	}
 
 	public void draw(
-		GraphicsWrapper gw,
-		boolean highlightMajorCScale,
-		int midiNoteNumber1ToHilite,
-		int beat1ToHilite,
-		int beat2ToHilite
-	) {
+			GraphicsWrapper gw,
+			boolean highlightMajorCScale,
+			int midiNoteNumber1ToHilite,
+			int beat1ToHilite,
+			int beat2ToHilite
+			) {
 		for ( int y = 0; y < numPitches; y++ ) {
 			int pitchClass = ( y + pitchClassOfLowestPitch ) % numPitchesInOctave;
 			int midiNoteNumber = y + midiNoteNumberOfLowestPitch;
@@ -198,15 +198,15 @@ class Score {
 
 	public AlignedRectangle2D getBoundingRectangle() {
 		return new AlignedRectangle2D(
-			new Point2D(0,-numPitches),
-			new Point2D(numBeats,0)
-		);
+				new Point2D(0,-numPitches),
+				new Point2D(numBeats,0)
+				);
 	}
-	
+
 	public void increaseNumBeat(int numBeats){
 		this.grid = cloneGrid(this.grid, numBeats);
 	}
-	
+
 	public boolean[][] cloneGrid(boolean[][] oldGrid, int numBeats){
 		boolean [][] newGrid = new boolean [numBeats][ this.numPitches ]; 
 		for ( int y = 0; y < numPitches; ++y ) {
@@ -217,13 +217,14 @@ class Score {
 		this.numBeats = numBeats;
 		return newGrid;
 	}
-	
+
 }
 
 class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotionListener, Runnable {
 
 	SimplePianoRoll simplePianoRoll;
 	GraphicsWrapper gw = new GraphicsWrapper();
+	Metronone metronone = new Metronone();
 
 	Score score = new Score();
 
@@ -285,7 +286,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				score.grid[x][y] = false;
 		repaint();
 	}
-	
+
 	public void frameAll() {
 		gw.frame( score.getBoundingRectangle(), false );
 		repaint();
@@ -301,12 +302,12 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		gw.enableAlphaBlending();
 
 		score.draw(
-			gw,
-			simplePianoRoll.highlightMajorScale,
-			midiNoteNumberOfMouseCurser,
-			beatOfMouseCursor,
-			currentBeat
-		);
+				gw,
+				simplePianoRoll.highlightMajorScale,
+				midiNoteNumberOfMouseCurser,
+				beatOfMouseCursor,
+				currentBeat
+				);
 
 		gw.setCoordinateSystemToPixels();
 
@@ -322,9 +323,9 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				final int x_offset = 15;
 
 				String s = score.namesOfPitchClasses[
-					( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
-					% score.numPitchesInOctave
-				];
+				                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+				                                     % score.numPitchesInOctave
+				                                     ];
 				int x0 = mouse_x + x_offset;
 				int y0 = mouse_y - RadialMenuWidget.textHeight - 2*margin;
 				int height = RadialMenuWidget.textHeight + 2*margin;
@@ -336,7 +337,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				gw.drawString( mouse_x + x_offset + margin, mouse_y - margin, s );
 			}
 		}
-		
+
 		//Tempo
 		g.setColor(Color.white);
 		g.setFont(new Font("default", Font.BOLD, 16));
@@ -347,9 +348,9 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		if ( e.getKeyCode() == KeyEvent.VK_CONTROL ) {
 			isControlKeyDown = true;
 			if (
-				beatOfMouseCursor>=0
-				&& simplePianoRoll.rolloverMode == SimplePianoRoll.RM_PLAY_NOTE_UPON_ROLLOVER_IF_SPECIAL_KEY_HELD_DOWN
-			)
+					beatOfMouseCursor>=0
+					&& simplePianoRoll.rolloverMode == SimplePianoRoll.RM_PLAY_NOTE_UPON_ROLLOVER_IF_SPECIAL_KEY_HELD_DOWN
+					)
 				playNote( midiNoteNumberOfMouseCurser );
 		}
 	}
@@ -371,9 +372,9 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		int newBeatOfMouseCursor = score.getBeatForMouseX( gw, mouse_x );
 		int newMidiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY( gw, mouse_y );
 		if (
-			newBeatOfMouseCursor != beatOfMouseCursor
-			|| newMidiNoteNumberOfMouseCurser != midiNoteNumberOfMouseCurser
-		) {
+				newBeatOfMouseCursor != beatOfMouseCursor
+				|| newMidiNoteNumberOfMouseCurser != midiNoteNumberOfMouseCurser
+				) {
 			beatOfMouseCursor = newBeatOfMouseCursor;
 			midiNoteNumberOfMouseCurser = newMidiNoteNumberOfMouseCurser;
 			repaint();
@@ -384,7 +385,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				if ( score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] != true ) {
 					score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] = true;
 					repaint();
-					
+
 				}
 			}
 			else if ( simplePianoRoll.dragMode == SimplePianoRoll.DM_ERASE_NOTES ) {
@@ -437,18 +438,18 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			int itemID = radialMenu.getIDOfSelection();
 			if ( 0 <= itemID ) {
 				switch ( itemID ) {
-					case RADIAL_MENU_PLAY:
-						simplePianoRoll.setMusicPlaying( true );
-						break;
-					case RADIAL_MENU_STOP:
-						simplePianoRoll.setMusicPlaying( false );
-						break;
-					case RADIAL_MENU_DRAW:
-						simplePianoRoll.setDragMode( SimplePianoRoll.DM_DRAW_NOTES );
-						break;
-					case RADIAL_MENU_ERASE:
-						simplePianoRoll.setDragMode( SimplePianoRoll.DM_ERASE_NOTES );
-						break;
+				case RADIAL_MENU_PLAY:
+					simplePianoRoll.setMusicPlaying( true );
+					break;
+				case RADIAL_MENU_STOP:
+					simplePianoRoll.setMusicPlaying( false );
+					break;
+				case RADIAL_MENU_DRAW:
+					simplePianoRoll.setDragMode( SimplePianoRoll.DM_DRAW_NOTES );
+					break;
+				case RADIAL_MENU_ERASE:
+					simplePianoRoll.setDragMode( SimplePianoRoll.DM_ERASE_NOTES );
+					break;
 				}
 			}
 
@@ -464,6 +465,10 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				repaint();
 			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
 				return;
+		}
+		
+		if(metronone.metrononeThreadSuspended){
+			metronone.stopBackgroundWork();
 		}
 	}
 
@@ -513,15 +518,15 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				stopPlayingNote( midiNoteNumberOfMouseCurser );
 				midiNoteNumberOfMouseCurser = newMidiNoteNumberOfMouseCurser;
 				if (
-					beatOfMouseCursor>=0
-					&& (
-						simplePianoRoll.rolloverMode == SimplePianoRoll.RM_PLAY_NOTE_UPON_ROLLOVER
-						|| (
-							simplePianoRoll.rolloverMode == SimplePianoRoll.RM_PLAY_NOTE_UPON_ROLLOVER_IF_SPECIAL_KEY_HELD_DOWN
-							&& isControlKeyDown
+						beatOfMouseCursor>=0
+						&& (
+								simplePianoRoll.rolloverMode == SimplePianoRoll.RM_PLAY_NOTE_UPON_ROLLOVER
+								|| (
+										simplePianoRoll.rolloverMode == SimplePianoRoll.RM_PLAY_NOTE_UPON_ROLLOVER_IF_SPECIAL_KEY_HELD_DOWN
+										&& isControlKeyDown
+										)
+								)
 						)
-					)
-				)
 					playNote( midiNoteNumberOfMouseCurser );
 				repaint();
 			}
@@ -577,6 +582,9 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 					System.out.println(tempo);
 					if(tempo > 0){
 						score.tempo = tempo;
+						if(!metronone.metrononeThreadSuspended){
+							metronone.startBackgroundWork();
+						}
 					}
 					break;
 				default:
@@ -631,6 +639,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 								simplePianoRoll.midiChannels[0].noteOn( i+score.midiNoteNumberOfLowestPitch, Constant.midiVolume );
 						}
 					}
+
 				}
 				repaint();
 
@@ -646,6 +655,55 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			}
 		}
 		catch (InterruptedException e) { }
+	}
+
+
+	public class Metronone implements Runnable{
+		Thread metrononeThread = null;
+		boolean metrononeThreadSuspended = false;
+
+		public void startBackgroundWork() {
+			if ( metrononeThread == null ) {
+				metrononeThread = new Thread( this );
+				metrononeThreadSuspended = false;
+				metrononeThread.start();
+			}
+			else {
+				if ( metrononeThreadSuspended ) {
+					metrononeThreadSuspended = false;
+					synchronized( this ) {
+						notify();
+					}
+				}
+			}
+		}
+		
+		public void stopBackgroundWork() {
+			metrononeThreadSuspended = true;
+		}
+
+		@Override
+		public void run() {
+			try {
+				while(true){
+					synchronized(this){
+						simplePianoRoll.midiChannels[0].noteOn( 88+score.midiNoteNumberOfLowestPitch, Constant.midiVolume );
+					}
+					// Now the thread checks to see if it should suspend itself
+					if ( metrononeThreadSuspended ) {
+						synchronized( this ) {
+							while ( metrononeThreadSuspended ) {
+								wait();
+							}
+						}
+					}
+
+					metrononeThread.sleep( score.tempo );  // interval given in milliseconds
+				}
+
+			}
+			catch (InterruptedException e) { }
+		}
 	}
 
 }
@@ -732,11 +790,11 @@ public class SimplePianoRoll implements ActionListener {
 		}
 		else if ( source == quitMenuItem ) {
 			int response = JOptionPane.showConfirmDialog(
-				frame,
-				"Really quit?",
-				"Confirm Quit",
-				JOptionPane.YES_NO_OPTION
-			);
+					frame,
+					"Really quit?",
+					"Confirm Quit",
+					JOptionPane.YES_NO_OPTION
+					);
 
 			if (response == JOptionPane.YES_OPTION) {
 				System.exit(0);
@@ -770,12 +828,12 @@ public class SimplePianoRoll implements ActionListener {
 		}
 		else if ( source == aboutMenuItem ) {
 			JOptionPane.showMessageDialog(
-				frame,
-				"'" + applicationName + "' Sample Program\n"
-					+ "Original version written April 2011",
-				"About",
-				JOptionPane.INFORMATION_MESSAGE
-			);
+					frame,
+					"'" + applicationName + "' Sample Program\n"
+							+ "Original version written April 2011",
+							"About",
+							JOptionPane.INFORMATION_MESSAGE
+					);
 		}
 		else if ( source == playCheckBox ) {
 			isMusicPlaying = playCheckBox.isSelected();
@@ -822,7 +880,7 @@ public class SimplePianoRoll implements ActionListener {
 
 		if ( ! SwingUtilities.isEventDispatchThread() ) {
 			System.out.println(
-				"Warning: UI is not being created in the Event Dispatch Thread!");
+					"Warning: UI is not being created in the Event Dispatch Thread!");
 			assert false;
 		}
 
@@ -830,53 +888,53 @@ public class SimplePianoRoll implements ActionListener {
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
 		JMenuBar menuBar = new JMenuBar();
-			JMenu menu = new JMenu("File");
-				loadMidiItem = new JMenuItem("Load MIDI");
-				loadMidiItem.addActionListener(this);
-				menu.add(loadMidiItem);
-				
-				saveMidiItem = new JMenuItem("Save MIDI");
-				saveMidiItem.addActionListener(this);
-				menu.add(saveMidiItem);
-				
-				menu.addSeparator();
-				clearMenuItem = new JMenuItem("Clear");
-				clearMenuItem.addActionListener(this);
-				menu.add(clearMenuItem);
+		JMenu menu = new JMenu("File");
+		loadMidiItem = new JMenuItem("Load MIDI");
+		loadMidiItem.addActionListener(this);
+		menu.add(loadMidiItem);
 
-				menu.addSeparator();
+		saveMidiItem = new JMenuItem("Save MIDI");
+		saveMidiItem.addActionListener(this);
+		menu.add(saveMidiItem);
 
-				quitMenuItem = new JMenuItem("Quit");
-				quitMenuItem.addActionListener(this);
-				menu.add(quitMenuItem);
-			menuBar.add(menu);
-			menu = new JMenu("View");
-				showToolsMenuItem = new JCheckBoxMenuItem("Show Options");
-				showToolsMenuItem.setSelected( true );
-				showToolsMenuItem.addActionListener(this);
-				menu.add(showToolsMenuItem);
+		menu.addSeparator();
+		clearMenuItem = new JMenuItem("Clear");
+		clearMenuItem.addActionListener(this);
+		menu.add(clearMenuItem);
 
-				highlightMajorScaleMenuItem = new JCheckBoxMenuItem("Highlight Major C Scale");
-				highlightMajorScaleMenuItem.setSelected( highlightMajorScale );
-				highlightMajorScaleMenuItem.addActionListener(this);
-				menu.add(highlightMajorScaleMenuItem);
+		menu.addSeparator();
 
-				menu.addSeparator();
+		quitMenuItem = new JMenuItem("Quit");
+		quitMenuItem.addActionListener(this);
+		menu.add(quitMenuItem);
+		menuBar.add(menu);
+		menu = new JMenu("View");
+		showToolsMenuItem = new JCheckBoxMenuItem("Show Options");
+		showToolsMenuItem.setSelected( true );
+		showToolsMenuItem.addActionListener(this);
+		menu.add(showToolsMenuItem);
 
-				frameAllMenuItem = new JMenuItem("Frame All");
-				frameAllMenuItem.addActionListener(this);
-				menu.add(frameAllMenuItem);
+		highlightMajorScaleMenuItem = new JCheckBoxMenuItem("Highlight Major C Scale");
+		highlightMajorScaleMenuItem.setSelected( highlightMajorScale );
+		highlightMajorScaleMenuItem.addActionListener(this);
+		menu.add(highlightMajorScaleMenuItem);
 
-				autoFrameMenuItem = new JCheckBoxMenuItem("Auto Frame");
-				autoFrameMenuItem.setSelected( isAutoFrameActive );
-				autoFrameMenuItem.addActionListener(this);
-				menu.add(autoFrameMenuItem);
-			menuBar.add(menu);
-			menu = new JMenu("Help");
-				aboutMenuItem = new JMenuItem("About");
-				aboutMenuItem.addActionListener(this);
-				menu.add(aboutMenuItem);
-			menuBar.add(menu);
+		menu.addSeparator();
+
+		frameAllMenuItem = new JMenuItem("Frame All");
+		frameAllMenuItem.addActionListener(this);
+		menu.add(frameAllMenuItem);
+
+		autoFrameMenuItem = new JCheckBoxMenuItem("Auto Frame");
+		autoFrameMenuItem.setSelected( isAutoFrameActive );
+		autoFrameMenuItem.addActionListener(this);
+		menu.add(autoFrameMenuItem);
+		menuBar.add(menu);
+		menu = new JMenu("Help");
+		aboutMenuItem = new JMenuItem("About");
+		aboutMenuItem.addActionListener(this);
+		menu.add(aboutMenuItem);
+		menuBar.add(menu);
 		frame.setJMenuBar(menuBar);
 
 		toolPanel = new JPanel();
@@ -904,46 +962,46 @@ public class SimplePianoRoll implements ActionListener {
 
 		ButtonGroup dragModeButtonGroup = new ButtonGroup();
 
-			drawNotesRadioButton = new JRadioButton( "Draw Notes" );
-			drawNotesRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
-			drawNotesRadioButton.addActionListener(this);
-			if ( dragMode == DM_DRAW_NOTES ) drawNotesRadioButton.setSelected(true);
-			toolPanel.add( drawNotesRadioButton );
-			dragModeButtonGroup.add( drawNotesRadioButton );
+		drawNotesRadioButton = new JRadioButton( "Draw Notes" );
+		drawNotesRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
+		drawNotesRadioButton.addActionListener(this);
+		if ( dragMode == DM_DRAW_NOTES ) drawNotesRadioButton.setSelected(true);
+		toolPanel.add( drawNotesRadioButton );
+		dragModeButtonGroup.add( drawNotesRadioButton );
 
-			eraseNotesRadioButton = new JRadioButton( "Erase Notes" );
-			eraseNotesRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
-			eraseNotesRadioButton.addActionListener(this);
-			if ( dragMode == DM_ERASE_NOTES ) eraseNotesRadioButton.setSelected(true);
-			toolPanel.add( eraseNotesRadioButton );
-			dragModeButtonGroup.add( eraseNotesRadioButton );
+		eraseNotesRadioButton = new JRadioButton( "Erase Notes" );
+		eraseNotesRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
+		eraseNotesRadioButton.addActionListener(this);
+		if ( dragMode == DM_ERASE_NOTES ) eraseNotesRadioButton.setSelected(true);
+		toolPanel.add( eraseNotesRadioButton );
+		dragModeButtonGroup.add( eraseNotesRadioButton );
 
 		toolPanel.add( Box.createRigidArea(new Dimension(1,20)) );
 		toolPanel.add( new JLabel("Upon cursor rollover:") );
 
 		ButtonGroup rolloverModeButtonGroup = new ButtonGroup();
 
-			doNothingUponRolloverRadioButton = new JRadioButton( "Do Nothing" );
-			doNothingUponRolloverRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
-			doNothingUponRolloverRadioButton.addActionListener(this);
-			if ( rolloverMode == RM_DO_NOTHING_UPON_ROLLOVER ) doNothingUponRolloverRadioButton.setSelected(true);
-			toolPanel.add( doNothingUponRolloverRadioButton );
-			rolloverModeButtonGroup.add( doNothingUponRolloverRadioButton );
+		doNothingUponRolloverRadioButton = new JRadioButton( "Do Nothing" );
+		doNothingUponRolloverRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
+		doNothingUponRolloverRadioButton.addActionListener(this);
+		if ( rolloverMode == RM_DO_NOTHING_UPON_ROLLOVER ) doNothingUponRolloverRadioButton.setSelected(true);
+		toolPanel.add( doNothingUponRolloverRadioButton );
+		rolloverModeButtonGroup.add( doNothingUponRolloverRadioButton );
 
-			playNoteUponRolloverRadioButton = new JRadioButton( "Play Pitch" );
-			playNoteUponRolloverRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
-			playNoteUponRolloverRadioButton.addActionListener(this);
-			if ( rolloverMode == RM_PLAY_NOTE_UPON_ROLLOVER ) playNoteUponRolloverRadioButton.setSelected(true);
-			toolPanel.add( playNoteUponRolloverRadioButton );
-			rolloverModeButtonGroup.add( playNoteUponRolloverRadioButton );
+		playNoteUponRolloverRadioButton = new JRadioButton( "Play Pitch" );
+		playNoteUponRolloverRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
+		playNoteUponRolloverRadioButton.addActionListener(this);
+		if ( rolloverMode == RM_PLAY_NOTE_UPON_ROLLOVER ) playNoteUponRolloverRadioButton.setSelected(true);
+		toolPanel.add( playNoteUponRolloverRadioButton );
+		rolloverModeButtonGroup.add( playNoteUponRolloverRadioButton );
 
-			playNoteUponRolloverIfSpecialKeyHeldDownRadioButton = new JRadioButton( "Play Pitch if Ctrl down" );
-			playNoteUponRolloverIfSpecialKeyHeldDownRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
-			playNoteUponRolloverIfSpecialKeyHeldDownRadioButton.addActionListener(this);
-			if ( rolloverMode == RM_PLAY_NOTE_UPON_ROLLOVER_IF_SPECIAL_KEY_HELD_DOWN )
-				playNoteUponRolloverIfSpecialKeyHeldDownRadioButton.setSelected(true);
-			toolPanel.add( playNoteUponRolloverIfSpecialKeyHeldDownRadioButton );
-			rolloverModeButtonGroup.add( playNoteUponRolloverIfSpecialKeyHeldDownRadioButton );
+		playNoteUponRolloverIfSpecialKeyHeldDownRadioButton = new JRadioButton( "Play Pitch if Ctrl down" );
+		playNoteUponRolloverIfSpecialKeyHeldDownRadioButton.setAlignmentX( Component.LEFT_ALIGNMENT );
+		playNoteUponRolloverIfSpecialKeyHeldDownRadioButton.addActionListener(this);
+		if ( rolloverMode == RM_PLAY_NOTE_UPON_ROLLOVER_IF_SPECIAL_KEY_HELD_DOWN )
+			playNoteUponRolloverIfSpecialKeyHeldDownRadioButton.setSelected(true);
+		toolPanel.add( playNoteUponRolloverIfSpecialKeyHeldDownRadioButton );
+		rolloverModeButtonGroup.add( playNoteUponRolloverIfSpecialKeyHeldDownRadioButton );
 
 		frame.pack();
 		frame.setVisible( true );
@@ -955,13 +1013,13 @@ public class SimplePianoRoll implements ActionListener {
 	public static void main( String[] args ) {
 		// Schedule the creation of the UI for the event-dispatching thread.
 		javax.swing.SwingUtilities.invokeLater(
-			new Runnable() {
-				public void run() {
-					SimplePianoRoll sp = new SimplePianoRoll();
-					sp.createUI();
+				new Runnable() {
+					public void run() {
+						SimplePianoRoll sp = new SimplePianoRoll();
+						sp.createUI();
+					}
 				}
-			}
-		);
+				);
 	}
 }
 
