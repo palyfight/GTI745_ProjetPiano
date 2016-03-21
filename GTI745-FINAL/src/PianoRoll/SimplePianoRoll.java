@@ -1,41 +1,38 @@
 package PianoRoll;
 
-import java.util.ArrayList;
-
-import java.awt.Container;
-import java.awt.Component;
-import java.awt.Graphics;
 // import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
-
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JRadioButton;
-import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.ButtonGroup;
-import javax.swing.BoxLayout;
-import javax.swing.Box;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-
+import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
-import javax.sound.midi.MidiChannel;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.SwingUtilities;
 
 
 
@@ -72,6 +69,7 @@ class Score {
 	public static final int midiNoteNumberOfLowestPitch = 21;
 	public int numBeats = 128;
 	public boolean [][] grid;
+	public int tempo = 150;
 
 	public static final int numPitchesInOctave = 12;
 	public String [] namesOfPitchClasses;
@@ -338,6 +336,11 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				gw.drawString( mouse_x + x_offset + margin, mouse_y - margin, s );
 			}
 		}
+		
+		//Tempo
+		g.setColor(Color.white);
+		g.setFont(new Font("default", Font.BOLD, 16));
+		g.drawString("Tempo : " + score.tempo + " millisecondes", 50,50 );
 	}
 
 	public void keyPressed( KeyEvent e ) {
@@ -569,6 +572,13 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 						}
 					}
 					break;
+				case CONTROL_MENU_TEMPO:
+					int tempo = score.tempo + delta_x;
+					System.out.println(tempo);
+					if(tempo > 0){
+						score.tempo = tempo;
+					}
+					break;
 				default:
 					// TODO XXX
 					break;
@@ -602,7 +612,6 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 	}
 	public void run() {
 		try {
-			int sleepIntervalInMilliseconds = 150;
 			while (true) {
 
 				// Here's where the thread does some work
@@ -633,7 +642,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 						}
 					}
 				}
-				thread.sleep( sleepIntervalInMilliseconds );  // interval given in milliseconds
+				thread.sleep( score.tempo );  // interval given in milliseconds
 			}
 		}
 		catch (InterruptedException e) { }
