@@ -359,6 +359,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			isControlKeyDown = false;
 			stopPlayingNote( midiNoteNumberOfMouseCurser );
 		}
+		
 	}
 	public void keyTyped( KeyEvent e ) {
 	}
@@ -366,7 +367,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 
 	public void mouseClicked( MouseEvent e ) { }
 	public void mouseEntered( MouseEvent e ) { }
-	public void mouseExited( MouseEvent e ) { }
+	public void mouseExited( MouseEvent e ) {}
 
 	private void paint( int mouse_x, int mouse_y ) {
 		int newBeatOfMouseCursor = score.getBeatForMouseX( gw, mouse_x );
@@ -460,16 +461,17 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		}
 		if ( controlMenu.isVisible() ) {
 			int returnValue = controlMenu.releaseEvent( mouse_x, mouse_y );
-
+			
+			if( !metronone.metrononeThreadSuspended )
+				metronone.stopBackgroundWork();
 			if ( returnValue == CustomWidget.S_REDRAW )
 				repaint();
 			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
 				return;
+			
 		}
-		
-		if(metronone.metrononeThreadSuspended){
-			metronone.stopBackgroundWork();
-		}
+	
+
 	}
 
 	private void playNote( int midiNoteNumber ) {
@@ -581,7 +583,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 					int tempo = score.tempo + delta_x;
 					if(tempo > 0){
 						score.tempo = tempo;
-						if(!metronone.metrononeThreadSuspended){
+						if(metronone.metrononeThreadSuspended){
 							metronone.startBackgroundWork();
 						}
 					}
@@ -659,7 +661,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 
 	public class Metronone implements Runnable{
 		Thread metrononeThread = null;
-		boolean metrononeThreadSuspended = false;
+		boolean metrononeThreadSuspended = true;
 
 		public void startBackgroundWork() {
 			if ( metrononeThread == null ) {
