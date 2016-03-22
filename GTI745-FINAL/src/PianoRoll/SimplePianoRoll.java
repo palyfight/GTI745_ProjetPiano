@@ -729,7 +729,12 @@ public class SimplePianoRoll implements ActionListener {
 	JMenuItem frameAllMenuItem;
 	JCheckBoxMenuItem autoFrameMenuItem;
 	JMenuItem aboutMenuItem;
-
+	JCheckBoxMenuItem randomNotesMenuItem;
+	JCheckBoxMenuItem orientalNotesMenutItem;
+	JCheckBoxMenuItem pentatonicNotesMenutItem;
+	JMenuItem randomMusicMenuItem;
+	
+	
 	JCheckBox playCheckBox;
 	JCheckBox loopWhenPlayingCheckBox;
 
@@ -815,6 +820,18 @@ public class SimplePianoRoll implements ActionListener {
 			frame.invalidate();
 			frame.validate();
 		}
+		else if (source == randomNotesMenuItem){
+			
+		}
+		else if (source == orientalNotesMenutItem){
+			
+		}
+		else if (source == pentatonicNotesMenutItem){
+			
+		}
+		else if (source == randomMusicMenuItem){
+			
+		}
 		else if ( source == highlightMajorScaleMenuItem ) {
 			highlightMajorScale = highlightMajorScaleMenuItem.isSelected();
 			canvas.repaint();
@@ -889,6 +906,8 @@ public class SimplePianoRoll implements ActionListener {
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
 		JMenuBar menuBar = new JMenuBar();
+		
+		//-------------------FILE-------------------------------//
 		JMenu menu = new JMenu("File");
 		loadMidiItem = new JMenuItem("Load MIDI");
 		loadMidiItem.addActionListener(this);
@@ -909,6 +928,8 @@ public class SimplePianoRoll implements ActionListener {
 		quitMenuItem.addActionListener(this);
 		menu.add(quitMenuItem);
 		menuBar.add(menu);
+		
+		//-------------------VIEW-------------------------------//
 		menu = new JMenu("View");
 		showToolsMenuItem = new JCheckBoxMenuItem("Show Options");
 		showToolsMenuItem.setSelected( true );
@@ -931,6 +952,31 @@ public class SimplePianoRoll implements ActionListener {
 		autoFrameMenuItem.addActionListener(this);
 		menu.add(autoFrameMenuItem);
 		menuBar.add(menu);
+		
+		//-------------------OPTIONS-------------------------------//
+		menu = new JMenu("Options");
+		randomNotesMenuItem = new JCheckBoxMenuItem("Play any type of sound");
+		randomNotesMenuItem.setSelected(true);
+		randomNotesMenuItem.addActionListener(this);
+		menu.add(randomNotesMenuItem);
+		
+		orientalNotesMenutItem = new JCheckBoxMenuItem("Play oriental type of sound");
+		orientalNotesMenutItem.addActionListener(this);
+		menu.add(orientalNotesMenutItem);
+		
+		pentatonicNotesMenutItem = new JCheckBoxMenuItem("Play pentatonic type of sound");
+		pentatonicNotesMenutItem.addActionListener(this);
+		menu.add(pentatonicNotesMenutItem);
+		
+		menu.addSeparator();
+		
+		randomMusicMenuItem = new JMenuItem("Generate random music");
+		randomMusicMenuItem.addActionListener(this);
+		menu.add(randomMusicMenuItem);
+		
+		menuBar.add(menu);
+		
+		//-------------------HELP-------------------------------//
 		menu = new JMenu("Help");
 		aboutMenuItem = new JMenuItem("About");
 		aboutMenuItem.addActionListener(this);
