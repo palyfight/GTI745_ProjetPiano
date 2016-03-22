@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.Serializable;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
@@ -61,7 +62,7 @@ import javax.swing.SwingUtilities;
  */
 
 
-class Score {
+class Score implements Serializable{
 	public static final int midiNoteNumberOfMiddleC = 60;
 
 	public int numPitches = 88;
@@ -723,6 +724,8 @@ public class SimplePianoRoll implements ActionListener {
 	JMenuItem clearMenuItem;
 	JMenuItem loadMidiItem;
 	JMenuItem saveMidiItem;
+	JMenuItem loadItem;
+	JMenuItem saveItem;
 	JMenuItem quitMenuItem;
 	JCheckBoxMenuItem showToolsMenuItem;
 	JCheckBoxMenuItem highlightMajorScaleMenuItem;
@@ -888,8 +891,21 @@ public class SimplePianoRoll implements ActionListener {
 		frame = new JFrame( applicationName );
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
+		
+		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("File");
+		
+		loadItem = new JMenuItem("Load");
+		loadItem.addActionListener(this);
+		menu.add(loadItem);
+
+		saveItem = new JMenuItem("Save");
+		saveItem.addActionListener(this);
+		menu.add(saveItem);
+		
+		menu.addSeparator();
+
 		loadMidiItem = new JMenuItem("Load MIDI");
 		loadMidiItem.addActionListener(this);
 		menu.add(loadMidiItem);
