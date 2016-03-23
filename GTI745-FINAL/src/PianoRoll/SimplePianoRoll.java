@@ -250,6 +250,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 	int mouse_x, mouse_y, old_mouse_x, old_mouse_y;
 
 	boolean isControlKeyDown = false;
+	//Added
+	boolean isAltKeyDown = false;
 
 	int beatOfMouseCursor = -1; // -1 for none
 	int midiNoteNumberOfMouseCurser = -1; // -1 for none
@@ -405,6 +407,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		mouse_y = e.getY();
 
 		isControlKeyDown = e.isControlDown();
+		//Added
+		isAltKeyDown = e.isAltDown();
 
 		if ( radialMenu.isVisible() || (SwingUtilities.isLeftMouseButton(e) && e.isControlDown()) ) {
 			int returnValue = radialMenu.pressEvent( mouse_x, mouse_y );
@@ -421,7 +425,29 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				return;
 		}
 		if ( SwingUtilities.isLeftMouseButton(e) ) {
-			paint( mouse_x, mouse_y );
+			if(isAltKeyDown){
+				int newBeatOfMouseCursor = score.getBeatForMouseX( gw, mouse_x );
+				int newMidiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY( gw, mouse_y );
+				if (
+						newBeatOfMouseCursor != beatOfMouseCursor
+						|| newMidiNoteNumberOfMouseCurser != midiNoteNumberOfMouseCurser
+						) {
+					beatOfMouseCursor = newBeatOfMouseCursor;
+					midiNoteNumberOfMouseCurser = newMidiNoteNumberOfMouseCurser;
+					repaint();
+				}
+
+				if ( beatOfMouseCursor >= 0 && midiNoteNumberOfMouseCurser >= 0 ) {
+					if ( score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] != false ) {
+						score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] = false;
+						repaint();
+					}
+				}
+			
+			}
+			else{
+				paint( mouse_x, mouse_y );
+			}
 		}
 	}
 
@@ -432,7 +458,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		mouse_y = e.getY();
 
 		isControlKeyDown = e.isControlDown();
-
+		isAltKeyDown = e.isAltDown();
+		
 		if ( radialMenu.isVisible() ) {
 			int returnValue = radialMenu.releaseEvent( mouse_x, mouse_y );
 
@@ -469,6 +496,10 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
 				return;
 			
+		}
+		//Added
+		if (isAltKeyDown){
+			paint( mouse_x, mouse_y );
 		}
 	
 
@@ -543,9 +574,10 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		mouse_y = e.getY();
 		int delta_x = mouse_x - old_mouse_x;
 		int delta_y = mouse_y - old_mouse_y;
-
+		
 		isControlKeyDown = e.isControlDown();
-
+		isAltKeyDown = e.isAltDown();
+		
 		if ( radialMenu.isVisible() ) {
 			int returnValue = radialMenu.dragEvent( mouse_x, mouse_y );
 			if ( returnValue == CustomWidget.S_REDRAW )
@@ -595,7 +627,19 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				repaint();
 			}
 		}
-		else {
+		//Added
+		else if(isAltKeyDown){
+			int newBeatOfMouseCursor = score.getBeatForMouseX( gw, mouse_x );
+			int newMidiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY( gw, mouse_y );
+			if ( newBeatOfMouseCursor != beatOfMouseCursor ) {
+				beatOfMouseCursor = newBeatOfMouseCursor;
+			}
+			if ( newMidiNoteNumberOfMouseCurser != midiNoteNumberOfMouseCurser ) {
+				midiNoteNumberOfMouseCurser = newMidiNoteNumberOfMouseCurser;
+			}
+			repaint();
+		}
+		else{
 			paint( mouse_x, mouse_y );
 		}
 	}
