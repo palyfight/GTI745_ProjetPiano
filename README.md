@@ -24,9 +24,9 @@ gw.frame( score.getBoundingRectangle(),...)
 - **[Variante valant 2 points]** Rajouter une option pour générer de la musique alléatoire sur une gamme quelconque. Pendant votre présentation orale, discutez de quelles gammes vous avez essayées, et des algorithmes de choix de notes que vous avez essayés (exemple: choix hasard indépendent pour chaque note? Choix dépendent de la note précédente?), et lesquels semblaient fonctionner mieux. Pour vous inspirer, regardez peut-être l'algorithme dans la section 2.4 de Cabrol et al. 2013
 - **[1 point]** Modifiez le logiciel pour permettre des notes de différentes durées.
 - **[1 point]** Remplacer le ControlMenu et le menu radial avec une interface alternative pour accéder aux fonctionnalités. Pendant votre présentation orale, discutez des avantages et des inconvénients que vous avez trouvés avec le ControlMenu + menu radial versus votre nouvelle interface.
-- **[1 point]** Rajoutez une option pour sauvegarder et lire une pièce d'un fichier. Inventez votre propre format de fichier pour le faire. 
+- ~~**[1 point]** Rajoutez une option pour sauvegarder et lire une pièce d'un fichier. Inventez votre propre format de fichier pour le faire.~~
 
-- **[Variante valant 2 points]** Utilisez le format MIDI pour sauvegarder et lire vos fichiers. Quelques liens qui pourraient vous servir: http://www.classicalarchives.com: source de fichiers MIDI gratuits de pièces de musique classique
+- ~~**[Variante valant 2 points]** Utilisez le format MIDI pour sauvegarder et lire vos fichiers. Quelques liens qui pourraient vous servir: http://www.classicalarchives.com: source de fichiers MIDI gratuits de pièces de musique classique~~
 
 http://opera.media.mit.edu/rogus/home.html: Rogus McJava, librarie permettant de lire des fichiers MIDI, mais pour laquelle le code source ne semble plus disponible :( 
 
