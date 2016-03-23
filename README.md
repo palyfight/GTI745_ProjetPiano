@@ -13,7 +13,7 @@ Modifications et fonctionnalités à réaliser:
 ```java
 gw.frame( score.getBoundingRectangle(),...)
 ```
-- **[1 point]** Permettez à l'utilisateur de sélectionner des notes sur la portée, et de les déplacer en hauteur ou en temps avec un glissement de souris. 
+- ~~**[1 point]** Permettez à l'utilisateur de sélectionner des notes sur la portée, et de les déplacer en hauteur ou en temps avec un glissement de souris. 
 
 - **[Variante valant 2 points]** Permettez aussi à l'utilisateur de faire une copie d'une selection de notes et de coller cette copie ailleurs en temps.
 - ~~**[1 point]** Permettez à l'utilisateur de modifier le tempo (nombre de "temps" par seconde ou battements/seconde ou pulsations/seconde, ou autrement dit le nombre de millisecondes entre les "temps"). Vous pouvez réaliser ce changement en permettant à l'utilisateur de glisser sur "tempo" dans le ControlMenu. Vous devez aussi afficher le tempo (en temps/seconde, ou bien en millisecondes) actuel dans un champ de texte à quelque part.~~ 
