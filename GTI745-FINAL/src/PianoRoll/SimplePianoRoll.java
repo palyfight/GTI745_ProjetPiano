@@ -794,7 +794,7 @@ public class SimplePianoRoll implements ActionListener {
 		}
 		else if(source == saveMidiItem){
 			MIDIType ee = new MIDIType();
-			ee.save(canvas.score,"yolo");
+			ee.save(canvas.score,"yolo.midi");
 		}
 		else if ( source == quitMenuItem ) {
 			int response = JOptionPane.showConfirmDialog(
