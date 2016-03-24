@@ -499,12 +499,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			if ( simplePianoRoll.dragMode == SimplePianoRoll.DM_DRAW_NOTES ) {
 				if ( score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] != true ) {
 					score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] = true;
-					System.out.println("One: " + beatOfMouseCursor);
-					System.out.println("Two: " + midiNoteNumberOfMouseCurser);
-					System.out.println("Three: " + score.midiNoteNumberOfLowestPitch);
-					System.out.println("==========================================");
 					repaint();
-
 				}
 			}
 			else if ( simplePianoRoll.dragMode == SimplePianoRoll.DM_ERASE_NOTES ) {
@@ -539,7 +534,27 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				return;
 		}
 		if ( SwingUtilities.isLeftMouseButton(e) ) {
-			paint( mouse_x, mouse_y );
+			int midiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY(gw, mouse_y);
+			int pitchClass = ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )% score.numPitchesInOctave;
+			
+			if(simplePianoRoll.customSelected){
+				if(score.pitchClassesCustomScale[pitchClass]){
+					paint( mouse_x, mouse_y );
+				}
+			}
+			else if(simplePianoRoll.orientalSelected){
+				if(score.pitchClassesInOrientalScale[pitchClass]){
+					paint( mouse_x, mouse_y );
+				}
+			}
+			else if(simplePianoRoll.pentatonicSelected){
+				if(score.pitchClassesInMajorPentatonicScale[pitchClass]){
+					paint( mouse_x, mouse_y );
+				}
+			}
+			else {
+				paint( mouse_x, mouse_y );
+			}
 		}
 	}
 
@@ -714,7 +729,27 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			}
 		}
 		else {
-			paint( mouse_x, mouse_y );
+			int midiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY(gw, mouse_y);
+			int pitchClass = ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )% score.numPitchesInOctave;
+			
+			if(simplePianoRoll.customSelected){
+				if(score.pitchClassesCustomScale[pitchClass]){
+					paint( mouse_x, mouse_y );
+				}
+			}
+			else if(simplePianoRoll.orientalSelected){
+				if(score.pitchClassesInOrientalScale[pitchClass]){
+					paint( mouse_x, mouse_y );
+				}
+			}
+			else if(simplePianoRoll.pentatonicSelected){
+				if(score.pitchClassesInMajorPentatonicScale[pitchClass]){
+					paint( mouse_x, mouse_y );
+				}
+			}
+			else {
+				paint( mouse_x, mouse_y );
+			}
 		}
 	}
 
