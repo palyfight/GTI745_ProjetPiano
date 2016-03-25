@@ -535,7 +535,12 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		}
 		if ( SwingUtilities.isLeftMouseButton(e) ) {
 			int midiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY(gw, mouse_y);
+			System.out.println("PIPI midiNoteNumberOfMouseCurser: "+midiNoteNumberOfMouseCurser);
 			int pitchClass = ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )% score.numPitchesInOctave;
+			System.out.println("ANUS score.midiNoteNumberOfLowestPitch: "+score.midiNoteNumberOfLowestPitch);
+			System.out.println("ANUS score.pitchClassOfLowestPitch : "+score.pitchClassOfLowestPitch);
+			System.out.println("ANUS score.numPitchesInOctave: "+score.numPitchesInOctave);			
+			System.out.println("ANUS pitchClass: "+pitchClass);
 			
 			if(simplePianoRoll.customSelected){
 				if(score.pitchClassesCustomScale[pitchClass]){
@@ -553,6 +558,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				}
 			}
 			else {
+				System.out.println("CACA x: "+mouse_x+" y: "+mouse_y);
+				System.out.println("================================");
 				paint( mouse_x, mouse_y );
 			}
 		}
@@ -986,6 +993,7 @@ public class SimplePianoRoll implements ActionListener {
 			pentatonicSelected = false;
 			customNotesMenutItem.setSelected(false);
 			customSelected = false;
+			canvas.clear();
 			canvas.repaint();
 		}
 		else if (source == orientalNotesMenutItem){
@@ -996,6 +1004,7 @@ public class SimplePianoRoll implements ActionListener {
 			pentatonicSelected = false;
 			customNotesMenutItem.setSelected(false);
 			customSelected = false;
+			canvas.clear();
 			canvas.repaint();
 		}
 		else if (source == pentatonicNotesMenutItem){
@@ -1006,6 +1015,7 @@ public class SimplePianoRoll implements ActionListener {
 			orientalSelected = false;
 			customNotesMenutItem.setSelected(false);
 			customSelected = false;
+			canvas.clear();
 			canvas.repaint();
 		}
 		else if (source == customNotesMenutItem){
@@ -1016,12 +1026,24 @@ public class SimplePianoRoll implements ActionListener {
 			orientalSelected = false;
 			pentatonicNotesMenutItem.setSelected(false);
 			pentatonicSelected = false;
+			canvas.clear();
 			canvas.repaint();
 		}
 		else if (source == randomMusicMenuItem){
 			/*
 			 * ALGORITHM TO GENERATE MUSIC ...
 			 * */
+			/*
+			 for(int i=0; i<=max_x; i++){
+			 	int random_j = random(min_y, max_y);
+			 	for(int j=0; l<=random_j; j++){
+			 		int random_note = random(0, 9);
+			 		if(scaledSelected[random_note]){
+			 			noteArray[i][j] = random_note;
+			 		}
+			 	}
+			 }
+			*/
 		}
 		else if ( source == highlightMajorScaleMenuItem ) {
 			highlightMajorScale = highlightMajorScaleMenuItem.isSelected();
