@@ -33,6 +33,6 @@ http://opera.media.mit.edu/rogus/home.html: Rogus McJava, librarie permettant de
 http://www.jsresources.org/examples/midi_files.html 
 http://docs.oracle.com/javase/7/docs/api/javax/sound/midi/spi/MidiFileReader.html 
 http://www.automatic-pilot.com/midifile.html 
-- **[1 point]** Rajoutez un effet visuel artistique ou abstrait pour visualiser ou représenter l'historique des notes. Par exemple, quand la pièce joue, dessinez des tracées de couleurs pour chaque note, qui disparaissent graduellement. Voir la liste de visualisations de musique plus bas dans cet énoncé, et aussi dans les diapos de cours, pour des exemples.
+- ~~**[1 point]** Rajoutez un effet visuel artistique ou abstrait pour visualiser ou représenter l'historique des notes. Par exemple, quand la pièce joue, dessinez des tracées de couleurs pour chaque note, qui disparaissent graduellement. Voir la liste de visualisations de musique plus bas dans cet énoncé, et aussi dans les diapos de cours, pour des exemples.~~
 - **[0.5 points]** Passez 20 minutes à essayer de transcrire une pièce de musique que vous aimez, et notez tous les problèmes que vous rencontrez avec l'interface. Pendant votre présentation orale, discutez des changements qui vous semblent importants pour rendre l'interface plus utilisable, et que vous ferez si vous aviez plus de temps.
 Vous pouvez aussi proposer d'autres changements pour approbation par le chargé de labo.
