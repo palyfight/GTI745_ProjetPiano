@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
@@ -75,6 +76,9 @@ class Score {
 	public String [] namesOfPitchClasses;
 	public boolean [] pitchClassesInMajorScale;
 	public boolean [] pitchClassesToEmphasizeInMajorScale;
+	public boolean isReading;
+	public int readingPositionX;
+	public ArrayList <Integer> readingPositionY = new ArrayList <Integer>();
 
 	public Score() {
 		grid = new boolean[ numBeats ][ numPitches ];
@@ -190,10 +194,19 @@ class Score {
 		gw.setColor( 0, 0, 0 );
 		for ( int y = 0; y < numPitches; ++y ) {
 			for ( int x = 0; x < numBeats; ++x ) {
-				if ( grid[x][y] )
+				if ( grid[x][y] ){
 					gw.fillRect( x+0.3f, -y-0.7f, 0.4f, 0.4f );
+				}
+					
 			}
 		}
+		if(isReading){
+			gw.setColor(Color.RED);
+			for(int i = 0; i < readingPositionY.size(); i++){
+				gw.drawRect(readingPositionX+0.3f, -readingPositionY.get(i)-0.7f, 0.1f, 0.1f );
+			}	
+		}
+		gw.setColor(Color.BLACK);
 	}
 
 	public AlignedRectangle2D getBoundingRectangle() {
@@ -671,17 +684,25 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				synchronized( this ) {
 					if ( Constant.USE_SOUND ) {
 						for ( int i = 0; i < score.numPitches; ++i ) {
-							if ( score.grid[currentBeat][i] )
+							if ( score.grid[currentBeat][i] ){
 								simplePianoRoll.midiChannels[0].noteOff( i+score.midiNoteNumberOfLowestPitch );
+								score.isReading = false;
+							}	
 						}
 					}
 					currentBeat += 1;
 					if ( currentBeat >= score.numBeats )
 						currentBeat = 0;
 					if ( Constant.USE_SOUND ) {
+							score.readingPositionY.clear();
 						for ( int i = 0; i < score.numPitches; ++i ) {
-							if ( score.grid[currentBeat][i] )
+							if ( score.grid[currentBeat][i] ){
 								simplePianoRoll.midiChannels[0].noteOn( i+score.midiNoteNumberOfLowestPitch, Constant.midiVolume );
+								score.isReading = true;
+								score.readingPositionX = currentBeat;
+								score.readingPositionY.add(i);
+								repaint();
+							}
 						}
 					}
 
