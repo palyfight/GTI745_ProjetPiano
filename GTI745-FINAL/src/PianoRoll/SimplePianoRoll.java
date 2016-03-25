@@ -14,6 +14,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
@@ -78,6 +81,7 @@ class Score {
 	public boolean [] pitchClassesInOrientalScale;
 	public boolean [] pitchClassesInMajorPentatonicScale;
 	public boolean [] pitchClassesCustomScale;
+	public boolean [] pitchClassesGMinorPentatonicScale;
 
 	public Score() {
 		grid = new boolean[ numBeats ][ numPitches ];
@@ -123,6 +127,20 @@ class Score {
 		pitchClassesInMajorPentatonicScale[ 9] = true;
 		pitchClassesInMajorPentatonicScale[10] = false;
 		pitchClassesInMajorPentatonicScale[11] = false;
+
+		pitchClassesGMinorPentatonicScale = new boolean[ numPitchesInOctave ];
+		pitchClassesGMinorPentatonicScale[ 0] = true;
+		pitchClassesGMinorPentatonicScale[ 1] = false;
+		pitchClassesGMinorPentatonicScale[ 2] = true;
+		pitchClassesGMinorPentatonicScale[ 3] = false;
+		pitchClassesGMinorPentatonicScale[ 4] = false;
+		pitchClassesGMinorPentatonicScale[ 5] = true;
+		pitchClassesGMinorPentatonicScale[ 6] = false;
+		pitchClassesGMinorPentatonicScale[ 7] = true;
+		pitchClassesGMinorPentatonicScale[ 8] = false;
+		pitchClassesGMinorPentatonicScale[ 9] = false;
+		pitchClassesGMinorPentatonicScale[10] = false;
+		pitchClassesGMinorPentatonicScale[11] = true;
 
 		pitchClassesCustomScale = new boolean[ numPitchesInOctave ];
 		pitchClassesCustomScale[ 0] = true;
@@ -194,7 +212,8 @@ class Score {
 			boolean randomSelected,
 			boolean orientalSelected,
 			boolean pentatonicSelected,
-			boolean customSeletecd
+			boolean customSeletecd,
+			boolean gMinorSelected
 			) {
 		for ( int y = 0; y < numPitches; y++ ) {
 			int pitchClass = ( y + pitchClassOfLowestPitch ) % numPitchesInOctave;
@@ -236,6 +255,12 @@ class Score {
 			}
 			else if (customSeletecd){
 				if ( pitchClassesCustomScale[ pitchClass ] ) {
+					gw.setColor( 0.6f, 0.6f, 0.6f );
+					gw.fillRect( 0, -y-0.6f, numBeats, 0.2f );
+				}
+			}
+			else if (gMinorSelected){
+				if ( pitchClassesGMinorPentatonicScale[ pitchClass ] ) {
 					gw.setColor( 0.6f, 0.6f, 0.6f );
 					gw.fillRect( 0, -y-0.6f, numBeats, 0.2f );
 				}
@@ -379,7 +404,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				simplePianoRoll.randomSelected,
 				simplePianoRoll.orientalSelected,
 				simplePianoRoll.pentatonicSelected,
-				simplePianoRoll.customSelected
+				simplePianoRoll.customSelected,
+				simplePianoRoll.gMinorSelected
 				);
 
 		gw.setCoordinateSystemToPixels();
@@ -435,7 +461,18 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 					height = RadialMenuWidget.textHeight + 2*margin;
 					}
 				}
-				
+				else if(simplePianoRoll.gMinorSelected){
+					if(score.pitchClassesGMinorPentatonicScale[
+					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+					                                     % score.numPitchesInOctave]){
+					s = score.namesOfPitchClasses[
+					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+					                                     % score.numPitchesInOctave
+					                                     ];
+					width = Math.round( gw.stringWidth( s ) + 2*margin );
+					height = RadialMenuWidget.textHeight + 2*margin;
+					}
+				}
 				else{
 					s = score.namesOfPitchClasses[
 					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
@@ -554,6 +591,11 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			}
 			else if(simplePianoRoll.pentatonicSelected){
 				if(score.pitchClassesInMajorPentatonicScale[pitchClass]){
+					paint( mouse_x, mouse_y );
+				}
+			}
+			else if(simplePianoRoll.gMinorSelected){
+				if(score.pitchClassesGMinorPentatonicScale[pitchClass]){
 					paint( mouse_x, mouse_y );
 				}
 			}
@@ -754,6 +796,11 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 					paint( mouse_x, mouse_y );
 				}
 			}
+			else if(simplePianoRoll. gMinorSelected){
+				if(score.pitchClassesGMinorPentatonicScale[pitchClass]){
+					paint( mouse_x, mouse_y );
+				}
+			}
 			else {
 				paint( mouse_x, mouse_y );
 			}
@@ -893,6 +940,7 @@ public class SimplePianoRoll implements ActionListener {
 	JCheckBoxMenuItem orientalNotesMenutItem;
 	JCheckBoxMenuItem pentatonicNotesMenutItem;
 	JCheckBoxMenuItem customNotesMenutItem;
+	JCheckBoxMenuItem gMinorNotesMenuItem;
 	JMenuItem randomMusicMenuItem;
 	
 	
@@ -913,6 +961,7 @@ public class SimplePianoRoll implements ActionListener {
 	public boolean orientalSelected = false;
 	public boolean pentatonicSelected = false;
 	public boolean customSelected = false;
+	public boolean gMinorSelected = false;
 	public boolean randomSelected = true;
 
 	// The DM_ prefix is for Drag Mode
@@ -993,6 +1042,8 @@ public class SimplePianoRoll implements ActionListener {
 			pentatonicSelected = false;
 			customNotesMenutItem.setSelected(false);
 			customSelected = false;
+			gMinorNotesMenuItem.setSelected(false);
+			gMinorSelected = false;
 			canvas.clear();
 			canvas.repaint();
 		}
@@ -1004,6 +1055,8 @@ public class SimplePianoRoll implements ActionListener {
 			pentatonicSelected = false;
 			customNotesMenutItem.setSelected(false);
 			customSelected = false;
+			gMinorNotesMenuItem.setSelected(false);
+			gMinorSelected = false;
 			canvas.clear();
 			canvas.repaint();
 		}
@@ -1015,6 +1068,8 @@ public class SimplePianoRoll implements ActionListener {
 			orientalSelected = false;
 			customNotesMenutItem.setSelected(false);
 			customSelected = false;
+			gMinorNotesMenuItem.setSelected(false);
+			gMinorSelected = false;
 			canvas.clear();
 			canvas.repaint();
 		}
@@ -1026,6 +1081,21 @@ public class SimplePianoRoll implements ActionListener {
 			orientalSelected = false;
 			pentatonicNotesMenutItem.setSelected(false);
 			pentatonicSelected = false;
+			gMinorNotesMenuItem.setSelected(false);
+			gMinorSelected = false;
+			canvas.clear();
+			canvas.repaint();
+		}
+		else if (source == gMinorNotesMenuItem){
+			customNotesMenutItem.setSelected(false);
+			customSelected = false;
+			randomNotesMenuItem.setSelected(false);
+			randomSelected = false;
+			orientalNotesMenutItem.setSelected(false);
+			orientalSelected = false;
+			pentatonicNotesMenutItem.setSelected(false);
+			pentatonicSelected = false;
+			gMinorSelected = gMinorNotesMenuItem.isSelected();
 			canvas.clear();
 			canvas.repaint();
 		}
@@ -1033,17 +1103,21 @@ public class SimplePianoRoll implements ActionListener {
 			/*
 			 * ALGORITHM TO GENERATE MUSIC ...
 			 * */
-			/*
-			 for(int i=0; i<=max_x; i++){
-			 	int random_j = random(min_y, max_y);
-			 	for(int j=0; l<=random_j; j++){
-			 		int random_note = random(0, 9);
-			 		if(scaledSelected[random_note]){
-			 			noteArray[i][j] = random_note;
-			 		}
+			
+			 //List<List<int>> listOfNotes = new ArrayList<List<int>>();
+			Score score = new Score();
+			Random rand = new Random();
+			List<ArrayList<Integer>> listOfNotes = new ArrayList<ArrayList<Integer>>();
+			
+			 for(int i=0; i<=score.numBeats; i++){
+				 int random_j = rand.nextInt(8)-1;
+
+			 	for(int j=0; j<=random_j; j++){
+					int random_y = rand.nextInt(434-82)+82;
+					listOfNotes.get(j).set(i, random_y);
 			 	}
 			 }
-			*/
+			
 		}
 		else if ( source == highlightMajorScaleMenuItem ) {
 			highlightMajorScale = highlightMajorScaleMenuItem.isSelected();
@@ -1184,6 +1258,10 @@ public class SimplePianoRoll implements ActionListener {
 		customNotesMenutItem = new JCheckBoxMenuItem("Play custom harmonious sound");
 		customNotesMenutItem.addActionListener(this);
 		menu.add(customNotesMenutItem);
+		
+		gMinorNotesMenuItem = new JCheckBoxMenuItem("Play G minor pentatonic sound");
+		gMinorNotesMenuItem.addActionListener(this);
+		menu.add(gMinorNotesMenuItem);
 		
 		menu.addSeparator();
 		
