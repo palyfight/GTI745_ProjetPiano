@@ -201,12 +201,23 @@ class Score {
 			}
 		}
 		if(isReading){
-			gw.setColor(Color.RED);
 			for(int i = 0; i < readingPositionY.size(); i++){
-				gw.drawRect(readingPositionX+0.3f, -readingPositionY.get(i)-0.7f, 0.1f, 0.1f );
-			}	
+				gw.setColor(Color.RED);
+				gw.drawRect(readingPositionX+0.3f, -readingPositionY.get(i)-0.7f, 0.1f, 0.1f );		
+				gw.drawRect((readingPositionX+0.3f)-3f, -readingPositionY.get(i)-10f, 7f, 5f );
+				gw.setFontHeight(4);
+				gw.setColor(Color.ORANGE);
+				
+				String note = "";
+				if (grid[readingPositionX][readingPositionY.get(i)] ){
+					note = namesOfPitchClasses[( (readingPositionY.get(i)+21) - midiNoteNumberOfLowestPitch + pitchClassOfLowestPitch )
+				                                     % numPitchesInOctave
+				                                     ];
+				}
+				gw.drawString((readingPositionX+0.3f)-2f, -readingPositionY.get(i)-6f, note);
+			}
+			gw.setFontHeight(14);
 		}
-		gw.setColor(Color.BLACK);
 	}
 
 	public AlignedRectangle2D getBoundingRectangle() {
@@ -701,7 +712,6 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 								score.isReading = true;
 								score.readingPositionX = currentBeat;
 								score.readingPositionY.add(i);
-								repaint();
 							}
 						}
 					}
