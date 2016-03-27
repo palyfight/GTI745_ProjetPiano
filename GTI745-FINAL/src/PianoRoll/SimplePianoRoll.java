@@ -906,24 +906,39 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			catch (InterruptedException e) { }
 		}
 	}
-
-	public void initializeGridToFalse(){
-		for ( int y = 0; y < score.numPitches; ++y ){
-			for ( int x = 0; x < score.numBeats; ++x ){
-				score.grid[x][y] = false;
-			}
-		}		
-	}
 	
 	public void generateBeat() {
-		initializeGridToFalse();
 		Random rand = new Random();
 		
 		for(int x = 0; x < score.numBeats; x++){
 			int random_num_notes = rand.nextInt(8)-1;
 			for(int y = 0; y < random_num_notes; y++){
 				int random_y = rand.nextInt(score.numPitches);
-				score.grid[x][random_y] = true;
+				int pitchClass = (random_y + score.pitchClassOfLowestPitch)%score.numPitchesInOctave;
+				
+				if(simplePianoRoll.customSelected){
+					if ( score.pitchClassesCustomScale[ pitchClass ] ) {
+						score.grid[x][random_y] = true;
+					}
+				}
+				else if(simplePianoRoll.gMinorSelected){
+					if ( score.pitchClassesGMinorPentatonicScale[ pitchClass ] ) {
+						score.grid[x][random_y] = true;
+					}
+				}
+				else if(simplePianoRoll.orientalSelected){
+					if ( score.pitchClassesInOrientalScale[ pitchClass ] ) {
+						score.grid[x][random_y] = true;
+					}
+				}
+				else if(simplePianoRoll.pentatonicSelected){
+					if ( score.pitchClassesInMajorPentatonicScale[ pitchClass ] ) {
+						score.grid[x][random_y] = true;
+					}
+				}
+				else if(simplePianoRoll.randomSelected){
+					score.grid[x][random_y] = true;
+				}
 			}
 		}
 	}
