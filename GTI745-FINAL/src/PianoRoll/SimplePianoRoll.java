@@ -572,12 +572,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		}
 		if ( SwingUtilities.isLeftMouseButton(e) ) {
 			int midiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY(gw, mouse_y);
-			System.out.println("PIPI midiNoteNumberOfMouseCurser: "+midiNoteNumberOfMouseCurser);
 			int pitchClass = ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )% score.numPitchesInOctave;
-			System.out.println("ANUS score.midiNoteNumberOfLowestPitch: "+score.midiNoteNumberOfLowestPitch);
-			System.out.println("ANUS score.pitchClassOfLowestPitch : "+score.pitchClassOfLowestPitch);
-			System.out.println("ANUS score.numPitchesInOctave: "+score.numPitchesInOctave);			
-			System.out.println("ANUS pitchClass: "+pitchClass);
 			
 			if(simplePianoRoll.customSelected){
 				if(score.pitchClassesCustomScale[pitchClass]){
@@ -600,8 +595,6 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				}
 			}
 			else {
-				System.out.println("CACA x: "+mouse_x+" y: "+mouse_y);
-				System.out.println("================================");
 				paint( mouse_x, mouse_y );
 			}
 		}
@@ -914,6 +907,26 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		}
 	}
 
+	public void initializeGridToFalse(){
+		for ( int y = 0; y < score.numPitches; ++y ){
+			for ( int x = 0; x < score.numBeats; ++x ){
+				score.grid[x][y] = false;
+			}
+		}		
+	}
+	
+	public void generateBeat() {
+		initializeGridToFalse();
+		Random rand = new Random();
+		
+		for(int x = 0; x < score.numBeats; x++){
+			int random_num_notes = rand.nextInt(8)-1;
+			for(int y = 0; y < random_num_notes; y++){
+				int random_y = rand.nextInt(score.numPitches);
+				score.grid[x][random_y] = true;
+			}
+		}
+	}
 }
 
 public class SimplePianoRoll implements ActionListener {
@@ -941,7 +954,7 @@ public class SimplePianoRoll implements ActionListener {
 	JCheckBoxMenuItem pentatonicNotesMenutItem;
 	JCheckBoxMenuItem customNotesMenutItem;
 	JCheckBoxMenuItem gMinorNotesMenuItem;
-	JMenuItem randomMusicMenuItem;
+	JMenuItem generateMusicMenuItem;
 	
 	
 	JCheckBox playCheckBox;
@@ -1099,25 +1112,10 @@ public class SimplePianoRoll implements ActionListener {
 			canvas.clear();
 			canvas.repaint();
 		}
-		else if (source == randomMusicMenuItem){
-			/*
-			 * ALGORITHM TO GENERATE MUSIC ...
-			 * */
-			
-			 //List<List<int>> listOfNotes = new ArrayList<List<int>>();
-			Score score = new Score();
-			Random rand = new Random();
-			List<ArrayList<Integer>> listOfNotes = new ArrayList<ArrayList<Integer>>();
-			
-			 for(int i=0; i<=score.numBeats; i++){
-				 int random_j = rand.nextInt(8)-1;
-
-			 	for(int j=0; j<=random_j; j++){
-					int random_y = rand.nextInt(434-82)+82;
-					listOfNotes.get(j).set(i, random_y);
-			 	}
-			 }
-			
+		else if (source == generateMusicMenuItem){//generateMusicMenuItem
+			canvas.clear();
+			canvas.generateBeat();
+			canvas.repaint();
 		}
 		else if ( source == highlightMajorScaleMenuItem ) {
 			highlightMajorScale = highlightMajorScaleMenuItem.isSelected();
@@ -1265,9 +1263,9 @@ public class SimplePianoRoll implements ActionListener {
 		
 		menu.addSeparator();
 		
-		randomMusicMenuItem = new JMenuItem("Generate random music");
-		randomMusicMenuItem.addActionListener(this);
-		menu.add(randomMusicMenuItem);
+		generateMusicMenuItem = new JMenuItem("Generate random music");
+		generateMusicMenuItem.addActionListener(this);
+		menu.add(generateMusicMenuItem);
 		
 		menuBar.add(menu);
 		
