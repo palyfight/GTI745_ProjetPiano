@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class HomeType implements ArchieveDataType{
+public class HomeType implements ArchiveDataType{
 
 	@Override
 	public void save(Score score,String filename) {
