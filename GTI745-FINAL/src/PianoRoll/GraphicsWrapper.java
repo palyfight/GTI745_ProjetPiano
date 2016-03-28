@@ -101,6 +101,10 @@ class GraphicsWrapper {
 	) {
 		zoomIn( zoomFactor, windowWidthInPixels * 0.5f, windowHeightInPixels * 0.5f );
 	}
+	
+	public Graphics2D getG2(){
+		return g2;
+	}
 
 	// This can be used to implement bimanual (2-handed) camera control,
 	// or 2-finger camera control, as in a "pinch" gesture
