@@ -26,7 +26,7 @@ gw.frame( score.getBoundingRectangle(),...)
 - **[1 point]** Remplacer le ControlMenu et le menu radial avec une interface alternative pour accéder aux fonctionnalités. Pendant votre présentation orale, discutez des avantages et des inconvénients que vous avez trouvés avec le ControlMenu + menu radial versus votre nouvelle interface.
 - ~~**[1 point]** Rajoutez une option pour sauvegarder et lire une pièce d'un fichier. Inventez votre propre format de fichier pour le faire.~~
 
-- >**[Variante valant 2 points]** Utilisez le format MIDI pour sauvegarder et lire vos fichiers. Quelques liens qui pourraient vous servir: http://www.classicalarchives.com: source de fichiers MIDI gratuits de pièces de musique classique
+- ~~**[Variante valant 2 points]** Utilisez le format MIDI pour sauvegarder et lire vos fichiers. Quelques liens qui pourraient vous servir: http://www.classicalarchives.com: source de fichiers MIDI gratuits de pièces de musique classique~~
 
 http://opera.media.mit.edu/rogus/home.html: Rogus McJava, librarie permettant de lire des fichiers MIDI, mais pour laquelle le code source ne semble plus disponible :( 
 

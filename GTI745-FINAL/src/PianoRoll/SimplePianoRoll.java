@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -26,6 +27,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -35,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 
@@ -63,7 +66,7 @@ import javax.swing.SwingUtilities;
  */
 
 
-class Score {
+class Score implements Serializable{
 	public static final int midiNoteNumberOfMiddleC = 60;
 
 	public int numPitches = 88;
@@ -520,6 +523,11 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		g.setColor(Color.white);
 		g.setFont(new Font("default", Font.BOLD, 16));
 		g.drawString("Tempo : " + score.tempo + " millisecondes", 50,50 );
+		
+		//Beats
+		g.setColor(Color.white);
+		g.setFont(new Font("default", Font.BOLD, 16));
+		g.drawString("Total Beats : " + score.numBeats , 300,50 );
 	}
 
 	public void keyPressed( KeyEvent e ) {
@@ -1032,6 +1040,8 @@ public class SimplePianoRoll implements ActionListener {
 	JMenuItem clearMenuItem;
 	JMenuItem loadMidiItem;
 	JMenuItem saveMidiItem;
+	JMenuItem loadItem;
+	JMenuItem saveItem;
 	JMenuItem quitMenuItem;
 	JCheckBoxMenuItem showToolsMenuItem;
 	JCheckBoxMenuItem highlightMajorScaleMenuItem;
@@ -1109,6 +1119,18 @@ public class SimplePianoRoll implements ActionListener {
 		Object source = e.getSource();
 		if ( source == clearMenuItem ) {
 			canvas.clear();
+		}
+		else if(source == loadMidiItem){
+			loadFile(0);
+		}
+		else if(source == saveMidiItem){
+			saveFile(0);
+		}
+		else if(source == loadItem){
+			loadFile(1);
+		}
+		else if(source == saveItem){
+			saveFile(1);
 		}
 		else if ( source == quitMenuItem ) {
 			int response = JOptionPane.showConfirmDialog(
@@ -1252,6 +1274,68 @@ public class SimplePianoRoll implements ActionListener {
 		else if ( source == playNoteUponRolloverIfSpecialKeyHeldDownRadioButton ) {
 			rolloverMode = RM_PLAY_NOTE_UPON_ROLLOVER_IF_SPECIAL_KEY_HELD_DOWN;
 		}
+		
+	}
+	
+	private void saveFile(int type){
+		JFileChooser chooser = new JFileChooser();
+	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+		        "GG File", "gg");
+		if(type == 0){
+		    filter = new FileNameExtensionFilter(
+			        "Midi File", "midi");
+		}
+	    chooser.setFileFilter(filter);
+	    int returnVal = chooser.showOpenDialog(canvas);
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+	    	String file = chooser.getSelectedFile().getAbsolutePath();
+
+	    	switch(type){
+	    	case 0:
+		    	if(!file.endsWith(".midi")){
+		    		file += ".midi";
+		    	}
+				MIDIType ee = new MIDIType();
+				ee.save(canvas.score,file);
+	    		break;
+	    	case 1:
+		    	if(!file.endsWith(".gg")){
+		    		file += ".gg";
+		    	}
+	    		HomeType ht = new HomeType();
+	    		ht.save(canvas.score, file);
+	    		break;
+	    	}
+	    }
+	}
+	
+	private void loadFile(int type){
+		  JFileChooser chooser = new JFileChooser();
+		    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			        "GG File", "gg");
+			if(type == 0){
+			    filter = new FileNameExtensionFilter(
+				        "Midi File", "midi");
+			}
+		    chooser.setFileFilter(filter);
+		    int returnVal = chooser.showOpenDialog(canvas);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		    	String file = chooser.getSelectedFile().getAbsolutePath();
+		    	Score s = null;
+		    	switch(type){
+		    	case 0:
+					MIDIType ee = new MIDIType();
+					s = ee.load(file);
+		    		break;
+		    	case 1:
+		    		HomeType ht = new HomeType();
+		    		s = ht.load(file);
+		    		break;
+		    	}
+				canvas.score.increaseNumBeat(s.numBeats);
+				canvas.score.grid = s.grid;
+				canvas.repaint();
+		    }
 	}
 
 
@@ -1279,10 +1363,23 @@ public class SimplePianoRoll implements ActionListener {
 		frame = new JFrame( applicationName );
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
+		
+		
 		JMenuBar menuBar = new JMenuBar();
 
 		//-------------------FILE-------------------------------//
 		JMenu menu = new JMenu("File");
+		
+		loadItem = new JMenuItem("Load");
+		loadItem.addActionListener(this);
+		menu.add(loadItem);
+
+		saveItem = new JMenuItem("Save");
+		saveItem.addActionListener(this);
+		menu.add(saveItem);
+		
+		menu.addSeparator();
+
 		loadMidiItem = new JMenuItem("Load MIDI");
 		loadMidiItem.addActionListener(this);
 		menu.add(loadMidiItem);
