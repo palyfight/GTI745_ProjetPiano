@@ -17,7 +17,6 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
@@ -82,6 +81,9 @@ class Score {
 	public boolean [] pitchClassesInMajorPentatonicScale;
 	public boolean [] pitchClassesCustomScale;
 	public boolean [] pitchClassesGMinorPentatonicScale;
+	public boolean isReading;
+	public int readingPositionX;
+	public ArrayList <Integer> readingPositionY = new ArrayList <Integer>();
 
 	public Score() {
 		grid = new boolean[ numBeats ][ numPitches ];
@@ -155,7 +157,7 @@ class Score {
 		pitchClassesCustomScale[ 9] = true;
 		pitchClassesCustomScale[10] = false;
 		pitchClassesCustomScale[11] = true;
-		
+
 		pitchClassesInMajorScale = new boolean[ numPitchesInOctave ];
 		pitchClassesInMajorScale[ 0] = true;
 		pitchClassesInMajorScale[ 1] = false;
@@ -222,7 +224,7 @@ class Score {
 				gw.setColor( 0, 1, 1 );
 				gw.fillRect( 0, -y-0.8f, numBeats, 0.6f );
 			}
-			
+
 			if ( midiNoteNumber == midiNoteNumberOfMiddleC ) {
 				gw.setColor( 1, 1, 1 );
 				gw.fillRect( 0, -y-0.7f, numBeats, 0.4f );
@@ -284,10 +286,19 @@ class Score {
 		gw.setColor( 0, 0, 0 );
 		for ( int y = 0; y < numPitches; ++y ) {
 			for ( int x = 0; x < numBeats; ++x ) {
-				if ( grid[x][y] )
+				if ( grid[x][y] ){
 					gw.fillRect( x+0.3f, -y-0.7f, 0.4f, 0.4f );
+				}
+
 			}
 		}
+		if(isReading){
+			gw.setColor(Color.RED);
+			for(int i = 0; i < readingPositionY.size(); i++){
+				gw.drawRect(readingPositionX+0.3f, -readingPositionY.get(i)-0.7f, 0.1f, 0.1f );
+			}	
+		}
+		gw.setColor(Color.BLACK);
 	}
 
 	public AlignedRectangle2D getBoundingRectangle() {
@@ -344,6 +355,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 	int mouse_x, mouse_y, old_mouse_x, old_mouse_y;
 
 	boolean isControlKeyDown = false;
+	//Added
+	boolean isAltKeyDown = false;
 
 	int beatOfMouseCursor = -1; // -1 for none
 	int midiNoteNumberOfMouseCurser = -1; // -1 for none
@@ -409,7 +422,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				);
 
 		gw.setCoordinateSystemToPixels();
-		
+
 		if ( radialMenu.isVisible() )
 			radialMenu.draw( gw );
 		if ( controlMenu.isVisible() )
@@ -420,68 +433,68 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			if ( midiNoteNumberOfMouseCurser >= 0 && beatOfMouseCursor >= 0 ) {
 				final int margin = 5;
 				final int x_offset = 15;
-				
+
 				String s="";
 				int width = 0;
 				int height = 0;
-				
+
 				if(simplePianoRoll.orientalSelected){
 					if(score.pitchClassesInOrientalScale[
 					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
 					                                     % score.numPitchesInOctave]){
-					s = score.namesOfPitchClasses[
-					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
-					                                     % score.numPitchesInOctave
-					                                     ];
-					width = Math.round( gw.stringWidth( s ) + 2*margin );
-					height = RadialMenuWidget.textHeight + 2*margin;
+						s = score.namesOfPitchClasses[
+						                              ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+						                              % score.numPitchesInOctave
+						                              ];
+						width = Math.round( gw.stringWidth( s ) + 2*margin );
+						height = RadialMenuWidget.textHeight + 2*margin;
 					}
 				}
 				else if(simplePianoRoll.pentatonicSelected){
 					if(score.pitchClassesInMajorPentatonicScale[
-					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
-					                                     % score.numPitchesInOctave]){
-					s = score.namesOfPitchClasses[
-					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
-					                                     % score.numPitchesInOctave
-					                                     ];
-					width = Math.round( gw.stringWidth( s ) + 2*margin );
-					height = RadialMenuWidget.textHeight + 2*margin;
+					                                            ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+					                                            % score.numPitchesInOctave]){
+						s = score.namesOfPitchClasses[
+						                              ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+						                              % score.numPitchesInOctave
+						                              ];
+						width = Math.round( gw.stringWidth( s ) + 2*margin );
+						height = RadialMenuWidget.textHeight + 2*margin;
 					}
 				}
 				else if(simplePianoRoll.customSelected){
 					if(score.pitchClassesCustomScale[
-					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
-					                                     % score.numPitchesInOctave]){
-					s = score.namesOfPitchClasses[
-					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
-					                                     % score.numPitchesInOctave
-					                                     ];
-					width = Math.round( gw.stringWidth( s ) + 2*margin );
-					height = RadialMenuWidget.textHeight + 2*margin;
+					                                 ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+					                                 % score.numPitchesInOctave]){
+						s = score.namesOfPitchClasses[
+						                              ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+						                              % score.numPitchesInOctave
+						                              ];
+						width = Math.round( gw.stringWidth( s ) + 2*margin );
+						height = RadialMenuWidget.textHeight + 2*margin;
 					}
 				}
 				else if(simplePianoRoll.gMinorSelected){
 					if(score.pitchClassesGMinorPentatonicScale[
-					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
-					                                     % score.numPitchesInOctave]){
-					s = score.namesOfPitchClasses[
-					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
-					                                     % score.numPitchesInOctave
-					                                     ];
-					width = Math.round( gw.stringWidth( s ) + 2*margin );
-					height = RadialMenuWidget.textHeight + 2*margin;
+					                                           ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+					                                           % score.numPitchesInOctave]){
+						s = score.namesOfPitchClasses[
+						                              ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+						                              % score.numPitchesInOctave
+						                              ];
+						width = Math.round( gw.stringWidth( s ) + 2*margin );
+						height = RadialMenuWidget.textHeight + 2*margin;
 					}
 				}
 				else{
 					s = score.namesOfPitchClasses[
-					                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
-					                                     % score.numPitchesInOctave
-					                                     ];
+					                              ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
+					                              % score.numPitchesInOctave
+					                              ];
 					width = Math.round( gw.stringWidth( s ) + 2*margin );
 					height = RadialMenuWidget.textHeight + 2*margin;
 				}
-				
+
 				int x0 = mouse_x + x_offset;
 				int y0 = mouse_y - RadialMenuWidget.textHeight - 2*margin;
 				gw.setColor( 0, 0, 0, 0.6f );
@@ -513,7 +526,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			isControlKeyDown = false;
 			stopPlayingNote( midiNoteNumberOfMouseCurser );
 		}
-		
+
 	}
 	public void keyTyped( KeyEvent e ) {
 	}
@@ -555,6 +568,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		mouse_y = e.getY();
 
 		isControlKeyDown = e.isControlDown();
+		//Added
+		isAltKeyDown = e.isAltDown();
 
 		if ( radialMenu.isVisible() || (SwingUtilities.isLeftMouseButton(e) && e.isControlDown()) ) {
 			int returnValue = radialMenu.pressEvent( mouse_x, mouse_y );
@@ -573,7 +588,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		if ( SwingUtilities.isLeftMouseButton(e) ) {
 			int midiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY(gw, mouse_y);
 			int pitchClass = ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )% score.numPitchesInOctave;
-			
+
 			if(simplePianoRoll.customSelected){
 				if(score.pitchClassesCustomScale[pitchClass]){
 					paint( mouse_x, mouse_y );
@@ -595,7 +610,29 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				}
 			}
 			else {
-				paint( mouse_x, mouse_y );
+				if(isAltKeyDown){
+					int newBeatOfMouseCursor = score.getBeatForMouseX( gw, mouse_x );
+					int newMidiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY( gw, mouse_y );
+					if (
+							newBeatOfMouseCursor != beatOfMouseCursor
+							|| newMidiNoteNumberOfMouseCurser != midiNoteNumberOfMouseCurser
+							) {
+						beatOfMouseCursor = newBeatOfMouseCursor;
+						midiNoteNumberOfMouseCurser = newMidiNoteNumberOfMouseCurser;
+						repaint();
+					}
+
+					if ( beatOfMouseCursor >= 0 && midiNoteNumberOfMouseCurser >= 0 ) {
+						if ( score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] != false ) {
+							score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] = false;
+							repaint();
+						}
+					}
+
+				}
+				else{
+					paint( mouse_x, mouse_y );
+				}
 			}
 		}
 	}
@@ -607,6 +644,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		mouse_y = e.getY();
 
 		isControlKeyDown = e.isControlDown();
+		isAltKeyDown = e.isAltDown();
 
 		if ( radialMenu.isVisible() ) {
 			int returnValue = radialMenu.releaseEvent( mouse_x, mouse_y );
@@ -636,16 +674,20 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		}
 		if ( controlMenu.isVisible() ) {
 			int returnValue = controlMenu.releaseEvent( mouse_x, mouse_y );
-			
+
 			if( !metronone.metrononeThreadSuspended )
 				metronone.stopBackgroundWork();
 			if ( returnValue == CustomWidget.S_REDRAW )
 				repaint();
 			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
 				return;
-			
+
 		}
-	
+		//Added
+		if (isAltKeyDown){
+			paint( mouse_x, mouse_y );
+		}
+
 
 	}
 
@@ -720,6 +762,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		int delta_y = mouse_y - old_mouse_y;
 
 		isControlKeyDown = e.isControlDown();
+		isAltKeyDown = e.isAltDown();
 
 		if ( radialMenu.isVisible() ) {
 			int returnValue = radialMenu.dragEvent( mouse_x, mouse_y );
@@ -770,10 +813,11 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				repaint();
 			}
 		}
+
 		else {
 			int midiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY(gw, mouse_y);
 			int pitchClass = ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )% score.numPitchesInOctave;
-			
+
 			if(simplePianoRoll.customSelected){
 				if(score.pitchClassesCustomScale[pitchClass]){
 					paint( mouse_x, mouse_y );
@@ -793,6 +837,18 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				if(score.pitchClassesGMinorPentatonicScale[pitchClass]){
 					paint( mouse_x, mouse_y );
 				}
+			}
+			//Added
+			else if(isAltKeyDown){
+				int newBeatOfMouseCursor = score.getBeatForMouseX( gw, mouse_x );
+				int newMidiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY( gw, mouse_y );
+				if ( newBeatOfMouseCursor != beatOfMouseCursor ) {
+					beatOfMouseCursor = newBeatOfMouseCursor;
+				}
+				if ( newMidiNoteNumberOfMouseCurser != midiNoteNumberOfMouseCurser ) {
+					midiNoteNumberOfMouseCurser = newMidiNoteNumberOfMouseCurser;
+				}
+				repaint();
 			}
 			else {
 				paint( mouse_x, mouse_y );
@@ -827,17 +883,25 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				synchronized( this ) {
 					if ( Constant.USE_SOUND ) {
 						for ( int i = 0; i < score.numPitches; ++i ) {
-							if ( score.grid[currentBeat][i] )
+							if ( score.grid[currentBeat][i] ){
 								simplePianoRoll.midiChannels[0].noteOff( i+score.midiNoteNumberOfLowestPitch );
+								score.isReading = false;
+							}	
 						}
 					}
 					currentBeat += 1;
 					if ( currentBeat >= score.numBeats )
 						currentBeat = 0;
 					if ( Constant.USE_SOUND ) {
+						score.readingPositionY.clear();
 						for ( int i = 0; i < score.numPitches; ++i ) {
-							if ( score.grid[currentBeat][i] )
+							if ( score.grid[currentBeat][i] ){
 								simplePianoRoll.midiChannels[0].noteOn( i+score.midiNoteNumberOfLowestPitch, Constant.midiVolume );
+								score.isReading = true;
+								score.readingPositionX = currentBeat;
+								score.readingPositionY.add(i);
+								repaint();
+							}
 						}
 					}
 
@@ -878,7 +942,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				}
 			}
 		}
-		
+
 		public void stopBackgroundWork() {
 			metrononeThreadSuspended = true;
 		}
@@ -906,16 +970,16 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			catch (InterruptedException e) { }
 		}
 	}
-	
+
 	public void generateBeat() {
 		Random rand = new Random();
-		
+
 		for(int x = 0; x < score.numBeats; x++){
 			int random_num_notes = rand.nextInt(8)-1;
 			for(int y = 0; y < random_num_notes; y++){
 				int random_y = rand.nextInt(score.numPitches);
 				int pitchClass = (random_y + score.pitchClassOfLowestPitch)%score.numPitchesInOctave;
-				
+
 				if(simplePianoRoll.customSelected){
 					if ( score.pitchClassesCustomScale[ pitchClass ] ) {
 						score.grid[x][random_y] = true;
@@ -970,8 +1034,8 @@ public class SimplePianoRoll implements ActionListener {
 	JCheckBoxMenuItem customNotesMenutItem;
 	JCheckBoxMenuItem gMinorNotesMenuItem;
 	JMenuItem generateMusicMenuItem;
-	
-	
+
+
 	JCheckBox playCheckBox;
 	JCheckBox loopWhenPlayingCheckBox;
 
@@ -1206,7 +1270,7 @@ public class SimplePianoRoll implements ActionListener {
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
 		JMenuBar menuBar = new JMenuBar();
-		
+
 		//-------------------FILE-------------------------------//
 		JMenu menu = new JMenu("File");
 		loadMidiItem = new JMenuItem("Load MIDI");
@@ -1228,7 +1292,7 @@ public class SimplePianoRoll implements ActionListener {
 		quitMenuItem.addActionListener(this);
 		menu.add(quitMenuItem);
 		menuBar.add(menu);
-		
+
 		//-------------------VIEW-------------------------------//
 		menu = new JMenu("View");
 		showToolsMenuItem = new JCheckBoxMenuItem("Show Options");
@@ -1252,38 +1316,38 @@ public class SimplePianoRoll implements ActionListener {
 		autoFrameMenuItem.addActionListener(this);
 		menu.add(autoFrameMenuItem);
 		menuBar.add(menu);
-		
+
 		//-------------------OPTIONS-------------------------------//
 		menu = new JMenu("Options");
 		randomNotesMenuItem = new JCheckBoxMenuItem("Play any type of sound");
 		randomNotesMenuItem.setSelected(true);
 		randomNotesMenuItem.addActionListener(this);
 		menu.add(randomNotesMenuItem);
-		
+
 		orientalNotesMenutItem = new JCheckBoxMenuItem("Play oriental sound");
 		orientalNotesMenutItem.addActionListener(this);
 		menu.add(orientalNotesMenutItem);
-		
+
 		pentatonicNotesMenutItem = new JCheckBoxMenuItem("Play pentatonic sound");
 		pentatonicNotesMenutItem.addActionListener(this);
 		menu.add(pentatonicNotesMenutItem);
-		
+
 		customNotesMenutItem = new JCheckBoxMenuItem("Play custom harmonious sound");
 		customNotesMenutItem.addActionListener(this);
 		menu.add(customNotesMenutItem);
-		
+
 		gMinorNotesMenuItem = new JCheckBoxMenuItem("Play G minor pentatonic sound");
 		gMinorNotesMenuItem.addActionListener(this);
 		menu.add(gMinorNotesMenuItem);
-		
+
 		menu.addSeparator();
-		
+
 		generateMusicMenuItem = new JMenuItem("Generate random music");
 		generateMusicMenuItem.addActionListener(this);
 		menu.add(generateMusicMenuItem);
-		
+
 		menuBar.add(menu);
-		
+
 		//-------------------HELP-------------------------------//
 		menu = new JMenu("Help");
 		aboutMenuItem = new JMenuItem("About");
