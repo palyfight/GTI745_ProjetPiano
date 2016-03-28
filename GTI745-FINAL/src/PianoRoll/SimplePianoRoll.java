@@ -347,7 +347,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			if ( midiNoteNumberOfMouseCurser >= 0 && beatOfMouseCursor >= 0 ) {
 				final int margin = 5;
 				final int x_offset = 15;
-
+				
 				String s = score.namesOfPitchClasses[
 				                                     ( midiNoteNumberOfMouseCurser - score.midiNoteNumberOfLowestPitch + score.pitchClassOfLowestPitch )
 				                                     % score.numPitchesInOctave
