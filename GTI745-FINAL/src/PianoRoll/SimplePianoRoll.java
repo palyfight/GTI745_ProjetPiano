@@ -87,6 +87,7 @@ class Score implements Serializable{
 	public boolean isReading;
 	public int readingPositionX;
 	public ArrayList <Integer> readingPositionY = new ArrayList <Integer>();
+	public ArrayList <ColoredPoint> ColoredPoints = new ArrayList <ColoredPoint>();
 
 	public Score() {
 		grid = new boolean[ numBeats ][ numPitches ];
@@ -296,20 +297,24 @@ class Score implements Serializable{
 			}
 		}
 		if(isReading){
-			for(int i = 0; i < readingPositionY.size(); i++){
-				gw.setColor(Color.RED);
-				gw.drawRect(readingPositionX+0.3f, -readingPositionY.get(i)-0.7f, 0.1f, 0.1f );		
-				gw.drawRect((readingPositionX+0.3f)-3f, -readingPositionY.get(i)-10f, 7f, 5f );
-				gw.setFontHeight(4);
-				gw.setColor(Color.ORANGE);
-				
-				String note = "";
-				if (grid[readingPositionX][readingPositionY.get(i)] ){
-					note = namesOfPitchClasses[( (readingPositionY.get(i)+21) - midiNoteNumberOfLowestPitch + pitchClassOfLowestPitch )
-				                                     % numPitchesInOctave
-				                                     ];
+			for(int i = 0; i < ColoredPoints.size(); i++){
+				gw.setColor(ColoredPoints.get(i).getCurrentColor());
+				ColoredPoints.get(i).changeColor();
+				gw.drawRect(ColoredPoints.get(i).getxPosition()+0.3f, -ColoredPoints.get(i).getyPosition()-0.7f, 0.1f, 0.1f );		
+
+				if(ColoredPoints.get(i).getCurrentColor() == Color.RED) {
+					gw.setFontHeight(4);
+					String note = "";
+					if (grid[ColoredPoints.get(i).getxPosition()][ColoredPoints.get(i).getyPosition()] ){
+						note = namesOfPitchClasses[( (ColoredPoints.get(i).getyPosition()+21) - midiNoteNumberOfLowestPitch + pitchClassOfLowestPitch )
+						                           % numPitchesInOctave
+						                           ];
+					}
+					gw.drawString((ColoredPoints.get(i).getxPosition()+0.3f)-2f, -ColoredPoints.get(i).getyPosition()-6f, note);
 				}
-				gw.drawString((readingPositionX+0.3f)-2f, -readingPositionY.get(i)-6f, note);
+				if(ColoredPoints.get(i).getCurrentIndex() == ColoredPoints.get(i).getPointColors().size()-1){
+					ColoredPoints.remove(i);
+				}
 			}
 			gw.setFontHeight(14);
 		}
@@ -523,7 +528,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		g.setColor(Color.white);
 		g.setFont(new Font("default", Font.BOLD, 16));
 		g.drawString("Tempo : " + score.tempo + " millisecondes", 50,50 );
-		
+
 		//Beats
 		g.setColor(Color.white);
 		g.setFont(new Font("default", Font.BOLD, 16));
@@ -904,7 +909,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 						for ( int i = 0; i < score.numPitches; ++i ) {
 							if ( score.grid[currentBeat][i] ){
 								simplePianoRoll.midiChannels[0].noteOff( i+score.midiNoteNumberOfLowestPitch );
-								score.isReading = false;
+								//score.isReading = false;
 							}	
 						}
 					}
@@ -917,8 +922,10 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 							if ( score.grid[currentBeat][i] ){
 								simplePianoRoll.midiChannels[0].noteOn( i+score.midiNoteNumberOfLowestPitch, Constant.midiVolume );
 								score.isReading = true;
-								score.readingPositionX = currentBeat;
-								score.readingPositionY.add(i);
+
+								score.ColoredPoints.add(new ColoredPoint(currentBeat,i,0));
+								//score.readingPositionX = currentBeat;
+								//score.readingPositionY.add(i);
 							}
 						}
 					}
@@ -996,9 +1003,9 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		 * int previousPitch = 0;
 		 * int random_pitch = rand.nextInt(10);
 		 * previousPitch += random_pitch;
-		*/
+		 */
 		//int random_start = rand.nextInt(score.numPitches+10)-30;
-		
+
 		for(int x = 0; x < score.numBeats; x++){
 			int random_num_notes = rand.nextInt(8)-1;
 			for(int y = 0; y < random_num_notes; y++){
@@ -1284,68 +1291,68 @@ public class SimplePianoRoll implements ActionListener {
 		else if ( source == playNoteUponRolloverIfSpecialKeyHeldDownRadioButton ) {
 			rolloverMode = RM_PLAY_NOTE_UPON_ROLLOVER_IF_SPECIAL_KEY_HELD_DOWN;
 		}
-		
+
 	}
-	
+
 	private void saveFile(int type){
 		JFileChooser chooser = new JFileChooser();
-	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
-		        "GG File", "gg");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				"GG File", "gg");
 		if(type == 0){
-		    filter = new FileNameExtensionFilter(
-			        "Midi File", "midi");
+			filter = new FileNameExtensionFilter(
+					"Midi File", "midi");
 		}
-	    chooser.setFileFilter(filter);
-	    int returnVal = chooser.showOpenDialog(canvas);
-	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-	    	String file = chooser.getSelectedFile().getAbsolutePath();
+		chooser.setFileFilter(filter);
+		int returnVal = chooser.showOpenDialog(canvas);
+		if(returnVal == JFileChooser.APPROVE_OPTION) {
+			String file = chooser.getSelectedFile().getAbsolutePath();
 
-	    	switch(type){
-	    	case 0:
-		    	if(!file.endsWith(".midi")){
-		    		file += ".midi";
-		    	}
+			switch(type){
+			case 0:
+				if(!file.endsWith(".midi")){
+					file += ".midi";
+				}
 				MIDIType ee = new MIDIType();
 				ee.save(canvas.score,file);
-	    		break;
-	    	case 1:
-		    	if(!file.endsWith(".gg")){
-		    		file += ".gg";
-		    	}
-	    		HomeType ht = new HomeType();
-	    		ht.save(canvas.score, file);
-	    		break;
-	    	}
-	    }
-	}
-	
-	private void loadFile(int type){
-		  JFileChooser chooser = new JFileChooser();
-		    FileNameExtensionFilter filter = new FileNameExtensionFilter(
-			        "GG File", "gg");
-			if(type == 0){
-			    filter = new FileNameExtensionFilter(
-				        "Midi File", "midi");
+				break;
+			case 1:
+				if(!file.endsWith(".gg")){
+					file += ".gg";
+				}
+				HomeType ht = new HomeType();
+				ht.save(canvas.score, file);
+				break;
 			}
-		    chooser.setFileFilter(filter);
-		    int returnVal = chooser.showOpenDialog(canvas);
-		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		    	String file = chooser.getSelectedFile().getAbsolutePath();
-		    	Score s = null;
-		    	switch(type){
-		    	case 0:
-					MIDIType ee = new MIDIType();
-					s = ee.load(file);
-		    		break;
-		    	case 1:
-		    		HomeType ht = new HomeType();
-		    		s = ht.load(file);
-		    		break;
-		    	}
-				canvas.score.increaseNumBeat(s.numBeats);
-				canvas.score.grid = s.grid;
-				canvas.repaint();
-		    }
+		}
+	}
+
+	private void loadFile(int type){
+		JFileChooser chooser = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				"GG File", "gg");
+		if(type == 0){
+			filter = new FileNameExtensionFilter(
+					"Midi File", "midi");
+		}
+		chooser.setFileFilter(filter);
+		int returnVal = chooser.showOpenDialog(canvas);
+		if(returnVal == JFileChooser.APPROVE_OPTION) {
+			String file = chooser.getSelectedFile().getAbsolutePath();
+			Score s = null;
+			switch(type){
+			case 0:
+				MIDIType ee = new MIDIType();
+				s = ee.load(file);
+				break;
+			case 1:
+				HomeType ht = new HomeType();
+				s = ht.load(file);
+				break;
+			}
+			canvas.score.increaseNumBeat(s.numBeats);
+			canvas.score.grid = s.grid;
+			canvas.repaint();
+		}
 	}
 
 
@@ -1373,13 +1380,13 @@ public class SimplePianoRoll implements ActionListener {
 		frame = new JFrame( applicationName );
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
-		
-		
+
+
 		JMenuBar menuBar = new JMenuBar();
 
 		//-------------------FILE-------------------------------//
 		JMenu menu = new JMenu("File");
-		
+
 		loadItem = new JMenuItem("Load");
 		loadItem.addActionListener(this);
 		menu.add(loadItem);
@@ -1387,7 +1394,7 @@ public class SimplePianoRoll implements ActionListener {
 		saveItem = new JMenuItem("Save");
 		saveItem.addActionListener(this);
 		menu.add(saveItem);
-		
+
 		menu.addSeparator();
 
 		loadMidiItem = new JMenuItem("Load MIDI");
