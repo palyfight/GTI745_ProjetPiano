@@ -298,7 +298,7 @@ class Score implements Serializable{
 		}
 		if(isReading){
 			for(int i = 0; i < ColoredPoints.size(); i++){
-				gw.setColor(ColoredPoints.get(i).getCurrentColor());
+				gw.setColor(ColoredPoints.get(i).getCurrentColor(),ColoredPoints.get(i).getOpacity()) ;
 				ColoredPoints.get(i).changeColor();
 				gw.drawRect(ColoredPoints.get(i).getxPosition()+0.3f, -ColoredPoints.get(i).getyPosition()-0.7f, 0.1f, 0.1f );		
 
@@ -924,7 +924,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 								simplePianoRoll.midiChannels[0].noteOn( i+score.midiNoteNumberOfLowestPitch, Constant.midiVolume );
 								score.isReading = true;
 
-								score.ColoredPoints.add(new ColoredPoint(currentBeat,i,0));
+								score.ColoredPoints.add(new ColoredPoint(currentBeat,i,0,1));
 								//score.readingPositionX = currentBeat;
 								//score.readingPositionY.add(i);
 							}

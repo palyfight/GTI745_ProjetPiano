@@ -11,12 +11,14 @@ public class ColoredPoint {
 	private int currentColor;
 	private ArrayList<Color> pointColors;
 	private int currentIndex;
+	private float opacity;
 	
-	public ColoredPoint(int xPosition, int yPosition, int current){
+	public ColoredPoint(int xPosition, int yPosition, int current, float opacity){
 		this.setxPosition(xPosition);
 		this.setyPosition(yPosition);
 		this.setCurrentColor(current);
 		this.setCurrentIndex(current);
+		this.setOpacity(opacity);
 		pointColors = new ArrayList<Color>();
 		pointColors.add(Color.RED);
 		pointColors.add(Color.RED);
@@ -45,9 +47,23 @@ public class ColoredPoint {
 		pointColors.add(Color.YELLOW);
 		pointColors.add(Color.YELLOW);
 		pointColors.add(Color.YELLOW);
+		pointColors.add(Color.GREEN);
+		pointColors.add(Color.GREEN);
+		pointColors.add(Color.GREEN);
+		pointColors.add(Color.GREEN);
+		pointColors.add(Color.GREEN);
+		pointColors.add(Color.GREEN);
 		pointColors.add(Color.BLACK);
 	}
 	
+	public float getOpacity() {
+		return opacity;
+	}
+
+	public void setOpacity(float opacity) {
+		this.opacity = opacity;
+	}
+
 	public int getxPosition() {
 		return xPosition;
 	}
@@ -73,6 +89,8 @@ public class ColoredPoint {
 		if(currentColor < pointColors.size() -1){
 			currentColor++;
 			currentIndex++;
+			if(opacity > 0)
+				opacity -= 0.03;
 		}
 	}
 	
