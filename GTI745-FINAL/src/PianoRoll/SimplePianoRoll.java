@@ -304,6 +304,7 @@ class Score implements Serializable{
 
 				if(ColoredPoints.get(i).getCurrentColor() == Color.RED) {
 					gw.setFontHeight(4);
+					gw.drawRect((ColoredPoints.get(i).getxPosition()+0.3f)-3f, -ColoredPoints.get(i).getyPosition()-10f, 7f, 5f );
 					String note = "";
 					if (grid[ColoredPoints.get(i).getxPosition()][ColoredPoints.get(i).getyPosition()] ){
 						note = namesOfPitchClasses[( (ColoredPoints.get(i).getyPosition()+21) - midiNoteNumberOfLowestPitch + pitchClassOfLowestPitch )
