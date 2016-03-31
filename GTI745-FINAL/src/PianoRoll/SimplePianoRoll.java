@@ -999,21 +999,27 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 
 	public void generateBeat() {
 		Random rand = new Random();
-		/*
-		 * Generate new beats according to previous pitch
-		 * int previousPitch = 0;
-		 * int random_pitch = rand.nextInt(10);
-		 * previousPitch += random_pitch;
-		 */
-		//int random_start = rand.nextInt(score.numPitches+10)-30;
+		
+		int [] limits = new int[7];
+		limits[ 0] = 15;
+		limits[ 1] = 27;
+		limits[ 2] = 39;
+		limits[ 3] = 51;
+		limits[ 4] = 63;
+		limits[ 5] = 75;
+		limits[ 6] = 87;
+		
+		int low = 0;
+		int high = 6;
+		
+		int random_line = rand.nextInt(high-low)+low;
+		int upper_bound = limits[random_line];
+		int lower_bound = upper_bound - 12;
 
 		for(int x = 0; x < score.numBeats; x++){
-			int random_num_notes = rand.nextInt(8)-1;
+			int random_num_notes = rand.nextInt(5)-1;
 			for(int y = 0; y < random_num_notes; y++){
-				//int random_pitch = rand.nextInt(30+1+10)-10;
-				int random_y = /*random_start + random_pitch;//*/rand.nextInt(score.numPitches);
-				//System.out.println(random_y);
-				//random_start = random_y;
+				int random_y = rand.nextInt(upper_bound-lower_bound)+lower_bound;
 				int pitchClass = (random_y + score.pitchClassOfLowestPitch)%score.numPitchesInOctave;
 
 				if(simplePianoRoll.customSelected){
