@@ -7,6 +7,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -350,6 +351,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 	SimplePianoRoll simplePianoRoll;
 	GraphicsWrapper gw = new GraphicsWrapper();
 	Metronone metronone = new Metronone();
+	Rectangle selection = null;
+	ArrayList<Point2D> altGrid = new ArrayList<Point2D>();
 
 	Score score = new Score();
 
@@ -369,10 +372,15 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 	public static final int CONTROL_MENU_TOTAL_DURATION = 3;
 	public static final int CONTROL_MENU_TRANSPOSE = 4;
 
+	public static final int CONTROL_MENU_T_TRANSLATE = 0;
+	public static final int CONTROL_MENU_T_COPY = 1;
+
 	RadialMenuWidget radialMenu = new RadialMenuWidget();
 	ControlMenuWidget controlMenu = new ControlMenuWidget();
+	ControlMenuWidget controlTranslate = new ControlMenuWidget();
 
 	int mouse_x, mouse_y, old_mouse_x, old_mouse_y;
+	Point2D rectAnchor = new Point2D();
 
 	boolean isControlKeyDown = false;
 	//Added
@@ -401,6 +409,10 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		controlMenu.setItemLabelAndID( 3, "Zoom", CONTROL_MENU_ZOOM );
 		controlMenu.setItemLabelAndID( 5, "Total Duration", CONTROL_MENU_TOTAL_DURATION );
 		controlMenu.setItemLabelAndID( 7, "Transpose", CONTROL_MENU_TRANSPOSE );
+
+		controlTranslate.setItemLabelAndID(ControlMenuWidget.CENTRAL_ITEM, "", -1);
+		controlTranslate.setItemLabelAndID( 1, "Translate", CONTROL_MENU_T_TRANSLATE );
+		controlTranslate.setItemLabelAndID( 2, "Copy", CONTROL_MENU_T_COPY );
 
 		gw.frame( score.getBoundingRectangle(), false );
 	}
@@ -447,6 +459,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			radialMenu.draw( gw );
 		if ( controlMenu.isVisible() )
 			controlMenu.draw( gw );
+		if (controlTranslate.isVisible())
+			controlTranslate.draw(gw);
 
 		if ( ! radialMenu.isVisible() && ! controlMenu.isVisible() ) {
 			// draw datatip
@@ -523,6 +537,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				gw.drawRect( x0, y0, width, height );
 				gw.drawString( mouse_x + x_offset + margin, mouse_y - margin, s );
 			}
+
 		}
 
 		//Tempo
@@ -534,6 +549,12 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		g.setColor(Color.white);
 		g.setFont(new Font("default", Font.BOLD, 16));
 		g.drawString("Total Beats : " + score.numBeats , 300,50 );
+
+		//selection
+		if(selection != null){
+			g.setColor(new Color(255,255,255, 95));
+			g.fillRect(selection.x, selection.y, selection.width, selection.height);
+		}
 	}
 
 	public void keyPressed( KeyEvent e ) {
@@ -570,6 +591,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			repaint();
 		}
 
+
 		if ( beatOfMouseCursor >= 0 && midiNoteNumberOfMouseCurser >= 0 ) {
 			if ( simplePianoRoll.dragMode == SimplePianoRoll.DM_DRAW_NOTES ) {
 				if ( score.grid[beatOfMouseCursor][midiNoteNumberOfMouseCurser-score.midiNoteNumberOfLowestPitch] != true ) {
@@ -584,6 +606,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				}
 			}
 		}
+
+
 	}
 
 	public void mousePressed( MouseEvent e ) {
@@ -591,6 +615,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		old_mouse_y = mouse_y;
 		mouse_x = e.getX();
 		mouse_y = e.getY();
+		rectAnchor = new Point2D(mouse_x,mouse_y);
+
 
 		isControlKeyDown = e.isControlDown();
 		//Added
@@ -605,6 +631,13 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		}
 		if ( controlMenu.isVisible() || (SwingUtilities.isLeftMouseButton(e) && e.isShiftDown()) ) {
 			int returnValue = controlMenu.pressEvent( mouse_x, mouse_y );
+			if ( returnValue == CustomWidget.S_REDRAW )
+				repaint();
+			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
+				return;
+		}
+		if ( controlTranslate.isVisible() || (SwingUtilities.isRightMouseButton(e) && e.isAltDown()) ) {
+			int returnValue = controlTranslate.pressEvent( mouse_x, mouse_y );
 			if ( returnValue == CustomWidget.S_REDRAW )
 				repaint();
 			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
@@ -708,9 +741,38 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				return;
 
 		}
+		if(controlTranslate.isVisible()){
+			int returnValue = controlTranslate.releaseEvent( mouse_x, mouse_y );
+			if ( returnValue == CustomWidget.S_REDRAW )
+				repaint();
+			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
+				return;
+
+		}
 		//Added
 		if (isAltKeyDown){
-			paint( mouse_x, mouse_y );
+			if(selection != null){
+				Point2D rectStart = gw.convertPixelsToWorldSpaceUnits(new Point2D(selection.x,selection.y));
+				Point2D rectEnd   = gw.convertPixelsToWorldSpaceUnits(new Point2D(selection.x + selection.width, selection.y + selection.height));
+
+				altGrid.clear();
+
+				for ( int y = 0; y < score.numPitches; ++y ) {
+					for ( int x = 0; x <  score.numBeats ; ++x ) {
+						if(score.grid[x][y]){
+							if((x >= Math.min(rectStart.x(),rectEnd.x()) && x <= Math.max(rectStart.x(),rectEnd.x())) && 
+									(y >= Math.min(Math.abs(rectStart.y()-1),Math.abs(rectEnd.y()-1)) && y <= Math.max(Math.abs(rectStart.y()-1),Math.abs(rectEnd.y()-1)) )){
+								altGrid.add(new Point2D(x,y));
+							}
+						}
+					}
+				}		
+
+				if(altGrid.isEmpty()){
+					selection = null;
+				}
+
+			}
 		}
 
 
@@ -746,6 +808,13 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		}
 		if ( controlMenu.isVisible() ) {
 			int returnValue = controlMenu.moveEvent( mouse_x, mouse_y );
+			if ( returnValue == CustomWidget.S_REDRAW )
+				repaint();
+			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
+				return;
+		}
+		if ( controlTranslate.isVisible() ) {
+			int returnValue = controlTranslate.moveEvent( mouse_x, mouse_y );
 			if ( returnValue == CustomWidget.S_REDRAW )
 				repaint();
 			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
@@ -838,6 +907,52 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				repaint();
 			}
 		}
+		if(controlTranslate.isVisible()){
+			if ( controlTranslate.isInMenuingMode() ) {
+				int returnValue = controlTranslate.dragEvent( mouse_x, mouse_y );
+				if ( returnValue == CustomWidget.S_REDRAW )
+					repaint();
+				if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
+					return;
+			}
+			else{
+				switch ( controlTranslate.getIDOfSelection() ) {
+					case CONTROL_MENU_T_TRANSLATE:
+
+						Point2D originalAnchor = new Point2D(selection.x, selection.y);
+						originalAnchor = gw.convertPixelsToWorldSpaceUnits(originalAnchor);
+						
+						selection.translate(delta_x,delta_y);
+											
+						for(int i = 0; i < altGrid.size(); i++){
+							Point2D pt = altGrid.get(i);
+							int newBeatOfMouseCursor = score.getBeatForMouseX( gw, mouse_x );
+							int newMidiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY( gw, mouse_y );
+
+							//score.grid[(int)pt.x()][(int)pt.y()] = false;
+							
+							int x_delta = (int) (originalAnchor.x() - pt.x());
+							int y_delta = (int) (originalAnchor.y() - pt.y());
+							System.out.println(pt.x() + " " + pt.y() + " " + x_delta + " " + y_delta);
+							System.out.println(y_delta);
+
+
+							altGrid.set(i,new Point2D(pt.x()+x_delta, Math.abs(pt.y()+y_delta)));
+							
+							/*pt = altGrid.get(i);
+							System.out.println(pt.y());
+							
+							if(pt.y()< score.numPitches && pt.x() < score.numBeats)
+								score.grid[(int)pt.x()][(int)pt.y()] = true;*/
+						}
+					break;
+					case CONTROL_MENU_T_COPY:
+						
+					break;
+				}
+				repaint();
+			}
+		}
 
 		else {
 			int midiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY(gw, mouse_y);
@@ -864,16 +979,17 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				}
 			}
 			//Added
-			else if(isAltKeyDown){
-				int newBeatOfMouseCursor = score.getBeatForMouseX( gw, mouse_x );
-				int newMidiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY( gw, mouse_y );
-				if ( newBeatOfMouseCursor != beatOfMouseCursor ) {
-					beatOfMouseCursor = newBeatOfMouseCursor;
+			else if(isAltKeyDown){				
+				if(SwingUtilities.isLeftMouseButton(e)){
+					int x = (int) Math.min(rectAnchor.x(), mouse_x);
+					int y = (int) Math.min(rectAnchor.y(), mouse_y);
+					int width = (int) Math.max(rectAnchor.x() - mouse_x, mouse_x - rectAnchor.x());
+					int height = (int) Math.max(rectAnchor.y() - mouse_y, mouse_y - rectAnchor.y());
+
+					selection = new Rectangle(x,y,width,height);
+					repaint();
 				}
-				if ( newMidiNoteNumberOfMouseCurser != midiNoteNumberOfMouseCurser ) {
-					midiNoteNumberOfMouseCurser = newMidiNoteNumberOfMouseCurser;
-				}
-				repaint();
+
 			}
 			else {
 				paint( mouse_x, mouse_y );
@@ -999,7 +1115,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 
 	public void generateBeat() {
 		Random rand = new Random();
-		
+
 		int [] limits = new int[7];
 		limits[ 0] = 15;
 		limits[ 1] = 27;
@@ -1008,10 +1124,10 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		limits[ 4] = 63;
 		limits[ 5] = 75;
 		limits[ 6] = 87;
-		
+
 		int low = 0;
 		int high = 6;
-		
+
 		int random_line = rand.nextInt(high-low)+low;
 		int upper_bound = limits[random_line];
 		int lower_bound = upper_bound - 12;
