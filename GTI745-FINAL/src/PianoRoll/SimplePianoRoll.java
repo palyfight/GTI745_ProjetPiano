@@ -358,6 +358,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 
 	Thread thread = null;
 	boolean threadSuspended;
+	
+	ArrayList<Point2D> original = new ArrayList<Point2D>();
 
 	int currentBeat = 0;
 
@@ -411,8 +413,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 		controlMenu.setItemLabelAndID( 7, "Transpose", CONTROL_MENU_TRANSPOSE );
 
 		controlTranslate.setItemLabelAndID(ControlMenuWidget.CENTRAL_ITEM, "", -1);
-		controlTranslate.setItemLabelAndID( 1, "Translate", CONTROL_MENU_T_TRANSLATE );
-		controlTranslate.setItemLabelAndID( 2, "Copy", CONTROL_MENU_T_COPY );
+		controlTranslate.setItemLabelAndID( 3, "Translate", CONTROL_MENU_T_TRANSLATE );
+		controlTranslate.setItemLabelAndID( 7, "Copy", CONTROL_MENU_T_COPY );
 
 		gw.frame( score.getBoundingRectangle(), false );
 	}
@@ -636,7 +638,7 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			if ( returnValue != CustomWidget.S_EVENT_NOT_CONSUMED )
 				return;
 		}
-		if ( controlTranslate.isVisible() || (SwingUtilities.isRightMouseButton(e) && e.isAltDown()) ) {
+		if ( controlTranslate.isVisible() || (SwingUtilities.isRightMouseButton(e) && e.isAltDown()) && selection != null) {
 			int returnValue = controlTranslate.pressEvent( mouse_x, mouse_y );
 			if ( returnValue == CustomWidget.S_REDRAW )
 				repaint();
@@ -742,6 +744,9 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 
 		}
 		if(controlTranslate.isVisible()){
+			selection = null;
+			altGrid.clear();
+			original.clear();
 			int returnValue = controlTranslate.releaseEvent( mouse_x, mouse_y );
 			if ( returnValue == CustomWidget.S_REDRAW )
 				repaint();
@@ -771,9 +776,12 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				if(altGrid.isEmpty()){
 					selection = null;
 				}
-
+				else{
+					original = (ArrayList<Point2D>) altGrid.clone();
+				}
 			}
 		}
+		
 
 
 	}
@@ -907,7 +915,8 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				repaint();
 			}
 		}
-		if(controlTranslate.isVisible()){
+		
+		else if(controlTranslate.isVisible()){
 			if ( controlTranslate.isInMenuingMode() ) {
 				int returnValue = controlTranslate.dragEvent( mouse_x, mouse_y );
 				if ( returnValue == CustomWidget.S_REDRAW )
@@ -918,41 +927,30 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 			else{
 				switch ( controlTranslate.getIDOfSelection() ) {
 					case CONTROL_MENU_T_TRANSLATE:
-
-						Point2D originalAnchor = new Point2D(selection.x, selection.y);
-						originalAnchor = gw.convertPixelsToWorldSpaceUnits(originalAnchor);
-						
-						selection.translate(delta_x,delta_y);
-											
-						for(int i = 0; i < altGrid.size(); i++){
-							Point2D pt = altGrid.get(i);
-							int newBeatOfMouseCursor = score.getBeatForMouseX( gw, mouse_x );
-							int newMidiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY( gw, mouse_y );
-
-							//score.grid[(int)pt.x()][(int)pt.y()] = false;
-							
-							int x_delta = (int) (originalAnchor.x() - pt.x());
-							int y_delta = (int) (originalAnchor.y() - pt.y());
-							System.out.println(pt.x() + " " + pt.y() + " " + x_delta + " " + y_delta);
-							System.out.println(y_delta);
-
-
-							altGrid.set(i,new Point2D(pt.x()+x_delta, Math.abs(pt.y()+y_delta)));
-							
-							/*pt = altGrid.get(i);
-							System.out.println(pt.y());
-							
-							if(pt.y()< score.numPitches && pt.x() < score.numBeats)
-								score.grid[(int)pt.x()][(int)pt.y()] = true;*/
-						}
+						translate(delta_x,delta_y);
 					break;
 					case CONTROL_MENU_T_COPY:
-						
+						translate(delta_x,delta_y);
+						for(int i = 0; i < original.size();i++){
+							score.grid[(int) original.get(i).x()][(int) original.get(i).y()] = true;
+						}
 					break;
 				}
 				repaint();
 			}
 		}
+		else if(isAltKeyDown){				
+			if(SwingUtilities.isLeftMouseButton(e)){
+				int x = (int) Math.min(rectAnchor.x(), mouse_x);
+				int y = (int) Math.min(rectAnchor.y(), mouse_y);
+				int width = (int) Math.max(rectAnchor.x() - mouse_x, mouse_x - rectAnchor.x());
+				int height = (int) Math.max(rectAnchor.y() - mouse_y, mouse_y - rectAnchor.y());
+
+				selection = new Rectangle(x,y,width,height);
+				repaint();
+			}
+		}
+		
 
 		else {
 			int midiNoteNumberOfMouseCurser = score.getMidiNoteNumberForMouseY(gw, mouse_y);
@@ -979,24 +977,44 @@ class MyCanvas extends JPanel implements KeyListener, MouseListener, MouseMotion
 				}
 			}
 			//Added
-			else if(isAltKeyDown){				
-				if(SwingUtilities.isLeftMouseButton(e)){
-					int x = (int) Math.min(rectAnchor.x(), mouse_x);
-					int y = (int) Math.min(rectAnchor.y(), mouse_y);
-					int width = (int) Math.max(rectAnchor.x() - mouse_x, mouse_x - rectAnchor.x());
-					int height = (int) Math.max(rectAnchor.y() - mouse_y, mouse_y - rectAnchor.y());
 
-					selection = new Rectangle(x,y,width,height);
-					repaint();
-				}
-
-			}
 			else {
 				paint( mouse_x, mouse_y );
 			}
 		}
+		
+		
+		
+		
 	}
+	public void translate(int delta_x, int delta_y){
+		Point2D originalAnchor = gw.convertPixelsToWorldSpaceUnits(new Point2D(selection.x, selection.y));
+		selection.translate(delta_x,delta_y);
+		Point2D updatedAnchor = gw.convertPixelsToWorldSpaceUnits(new Point2D(selection.x, selection.y));
+		ArrayList<Point2D> temp = new ArrayList<Point2D>();					
+		for(int i = 0; i < altGrid.size(); i++){
+			Point2D pt = altGrid.get(i);
+			
+			score.grid[(int)pt.x()][(int)pt.y()] = false;
+			
 
+			float distance_x = pt.x() - originalAnchor.x() ;
+			float distance_y = (float) (Math.ceil(Math.abs(originalAnchor.y())) - pt.y());
+			
+			int x = (int) (Math.ceil(updatedAnchor.x()) + Math.floor(distance_x));
+			int y = (int) (Math.ceil(Math.abs(updatedAnchor.y())) -Math.floor( distance_y));
+			//System.out.println("X : " + " Anchor O : " + originalAnchor.x() + " Anchor U : " + updatedAnchor.x()+ " Distance x : "+ distance_x +" OLD "+pt.x()+" NEW "+x);
+			//System.out.println("Y : " + " Anchor O : " + Math.abs(originalAnchor.y()) + " Anchor U : " + Math.abs(updatedAnchor.y())+ " Distance y : "+ distance_y +" OLD "+pt.y()+" NEW "+y);
+			//System.out.println("Y : " + Math.abs(updatedAnchor.y())+ " "+ distance_y +" "+y);
+			//System.out.println("X : " + originalAnchor.x() + " " + pt.x() + " " + distance_x);
+			if((x >= 0 && x < score.numBeats) && (y >=0 && y < score.numPitches)){
+				temp.add(new Point2D(x,y));
+				score.grid[x][y] = true;
+			}
+		}
+		altGrid.clear();
+		altGrid = temp;
+	}
 	public void startBackgroundWork() {
 		currentBeat = 0;
 		if ( thread == null ) {
