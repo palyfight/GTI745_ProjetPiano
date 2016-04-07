@@ -106,7 +106,8 @@ class Score implements Serializable{
 		namesOfPitchClasses[ 9] = "A";
 		namesOfPitchClasses[10] = "A#";
 		namesOfPitchClasses[11] = "B";
-
+		
+		//Oriental scale : C#, D#, F#, G#, A#
 		pitchClassesInOrientalScale = new boolean[ numPitchesInOctave ];
 		pitchClassesInOrientalScale[ 0] = false;
 		pitchClassesInOrientalScale[ 1] = true;
@@ -120,7 +121,8 @@ class Score implements Serializable{
 		pitchClassesInOrientalScale[ 9] = false;
 		pitchClassesInOrientalScale[10] = true;
 		pitchClassesInOrientalScale[11] = false;
-
+		
+		//Pentatonic Major scale : C, D, E, G, A
 		pitchClassesInMajorPentatonicScale = new boolean[ numPitchesInOctave ];
 		pitchClassesInMajorPentatonicScale[ 0] = true;
 		pitchClassesInMajorPentatonicScale[ 1] = false;
@@ -134,7 +136,8 @@ class Score implements Serializable{
 		pitchClassesInMajorPentatonicScale[ 9] = true;
 		pitchClassesInMajorPentatonicScale[10] = false;
 		pitchClassesInMajorPentatonicScale[11] = false;
-
+		
+		//Pentatonic G Minor scale : C, D, F, G, B
 		pitchClassesGMinorPentatonicScale = new boolean[ numPitchesInOctave ];
 		pitchClassesGMinorPentatonicScale[ 0] = true;
 		pitchClassesGMinorPentatonicScale[ 1] = false;
@@ -149,6 +152,7 @@ class Score implements Serializable{
 		pitchClassesGMinorPentatonicScale[10] = false;
 		pitchClassesGMinorPentatonicScale[11] = true;
 
+		//Custom harmonious scale : C, D, E, F#, G, A, B
 		pitchClassesCustomScale = new boolean[ numPitchesInOctave ];
 		pitchClassesCustomScale[ 0] = true;
 		pitchClassesCustomScale[ 1] = false;
@@ -1635,12 +1639,12 @@ public class SimplePianoRoll implements ActionListener {
 		playCheckBox.setAlignmentX( Component.LEFT_ALIGNMENT );
 		playCheckBox.addActionListener(this);
 		toolPanel.add( playCheckBox );
-
+		/*
 		loopWhenPlayingCheckBox = new JCheckBox("Loop when playing", isMusicLoopedWhenPlayed );
 		loopWhenPlayingCheckBox.setAlignmentX( Component.LEFT_ALIGNMENT );
 		loopWhenPlayingCheckBox.addActionListener(this);
 		toolPanel.add( loopWhenPlayingCheckBox );
-
+		 */
 		toolPanel.add( Box.createRigidArea(new Dimension(1,20)) );
 		toolPanel.add( new JLabel("During dragging:") );
 
