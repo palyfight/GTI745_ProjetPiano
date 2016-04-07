@@ -1468,6 +1468,8 @@ public class SimplePianoRoll implements ActionListener {
 				ht.save(canvas.score, file);
 				break;
 			}
+	        JOptionPane.showMessageDialog(null, file + " has been saved.", "Save File", JOptionPane.PLAIN_MESSAGE);
+
 		}
 	}
 
@@ -1494,9 +1496,11 @@ public class SimplePianoRoll implements ActionListener {
 				s = ht.load(file);
 				break;
 			}
+		
 			canvas.score.increaseNumBeat(s.numBeats);
 			canvas.score.grid = s.grid;
 			canvas.repaint();
+			JOptionPane.showMessageDialog(null, file + " has been loaded.", "Load File", JOptionPane.PLAIN_MESSAGE);			
 		}
 	}
 
