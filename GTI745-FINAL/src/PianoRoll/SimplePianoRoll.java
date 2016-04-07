@@ -1444,7 +1444,7 @@ public class SimplePianoRoll implements ActionListener {
 					"Midi File", "midi");
 		}
 		chooser.setFileFilter(filter);
-		int returnVal = chooser.showOpenDialog(canvas);
+		int returnVal = chooser.showSaveDialog(canvas);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
 			String file = chooser.getSelectedFile().getAbsolutePath();
 
